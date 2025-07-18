@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
-public class LoginController {
+public class LoginRegistrationController {
 
     private final RegistrationService registrationService;
 
-    public LoginController(RegistrationService registrationService) {
+    public LoginRegistrationController(RegistrationService registrationService) {
         this.registrationService = registrationService;
     }
 
