@@ -9,6 +9,8 @@
     Invalid username and password.</div>
 <div th:if="${param.logout}">
     You have been logged out.</div>
+<div th:if="${param.registerSuccess}">
+    You have registered successfully! Kindly Log in.</div>
 <form th:action="@{/login}" method="post">
     <div>
         <input type="text" name="username" placeholder="Username"/>
@@ -18,5 +20,6 @@
     </div>
     <input type="submit" value="Log in" />
 </form>
+<p>Don't have an account? <a th:href="@{/register}">Register here</a></p>
 </body>
 </html>
