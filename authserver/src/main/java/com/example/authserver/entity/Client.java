@@ -3,6 +3,8 @@ package com.example.authserver.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UuidGenerator;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -20,6 +22,8 @@ import java.util.Collection;
 public class Client {
 
     @Id
+    @GeneratedValue(generator = "UUID")
+    @UuidGenerator
     @Column(name = "id", length = 100)
     private String id;
 
@@ -93,11 +97,14 @@ public class Client {
     }
 
     private Set<String> stringToSet(String delimitedString) {
-        return StringUtils.commaDelimitedListToSet(delimitedString);
+        String[] stringArray = StringUtils.delimitedListToStringArray(delimitedString," ");
+        return Set.of(stringArray);
+        //return StringUtils.commaDelimitedListToSet(delimitedString);
     }
 
     private String collectionToString(Collection<String> collection) {
-        return StringUtils.collectionToCommaDelimitedString(collection);
+        return StringUtils.collectionToDelimitedString(collection," ");
+        //return StringUtils.collectionToCommaDelimitedString(collection);
     }
 
     @Override

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <title>Clients</title>
+</head>
+<body>
+<h1>Client List</h1>
+<div th:if="${clientList}">
+        <div th:each="clientMap : ${clientList}">
+            <table>
+                <tbody>
+                <tr th:each="entry : ${clientMap.entrySet()}">
+                    <td th:text="${entry.key}"></td>
+                    <td th:text="${entry.value}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <br/><br/>
+        </div>
+</div>
+</body>
+</html>

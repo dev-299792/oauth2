@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Registration</title>
+</head>
+<body>
+<h1>Register New Client</h1>
+<div th:unless="${generatedClient}">
+<form th:action="@{/add-client}" th:object="${client}" method="post">
+    <table>
+        <tr>
+            <td>
+                <label for="clientName">Client Name:</label> <br/>
+            </td>
+            <td>
+                <input type="text" id="clientName" th:field="*{clientName}"
+                       placeholder="My Awesome App">
+            </td>
+            <td th:if="${#fields.hasErrors('clientName')}" th:errors="*{clientName}">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="applicationType">Application Type:</label> <br/>
+            </td>
+            <td>
+                <select id="applicationType" th:field="*{applicationType}">
+                    <option value="">-- Select Type --</option>
+                    <option th:each="type : ${applicationTypes}"
+                            th:value="${type}"
+                            th:text="${type.displayName}">
+                    </option>
+                </select>
+            </td>
+            <td th:if="${#fields.hasErrors('applicationType')}" th:errors="*{applicationType}">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="redirectUri">Redirect URI:</label> <br/>
+            </td>
+            <td>
+                <input type="text" id="redirectUri" th:field="*{redirectUri}"
+                       placeholder="e.g., https://my-app.com/callback">
+            </td>
+            <td th:if="${#fields.hasErrors('redirectUri')}" th:errors="*{redirectUri}">
+                Redirect Uri Error
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <button type="submit">
+                    Register Client
+                </button>
+            </td>
+        </tr>
+    </table>
+</form>
+</div>
+
+<div th:if="${generatedClient}">
+    <p>Client registered Successfully.</p>
+    <table>
+        <tbody>
+        <tr th:each="entry : ${generatedClient.entrySet()}">
+            <td th:text="${entry.key}"></td>
+            <td th:text="${entry.value}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <p><a th:href="@{/add-client}">Register Another Client</a></p>
+</div>
+</body>
+</html>
