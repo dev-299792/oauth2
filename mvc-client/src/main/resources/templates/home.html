@@ -13,8 +13,15 @@
 </div>
 
 <div th:if="${code}">
-    <p>auth code generated : <span th:text="${code}"></span></p>
+    <p>Access Token retrieved : <span th:text="${code}"></span></p>
+
+    <br/>
+
+    <form th:action="@{/clear-token}" method="get">
+        <button type="submit">Delete Access Token</button>
+    </form>
 </div>
+
 
 </body>
 </html>

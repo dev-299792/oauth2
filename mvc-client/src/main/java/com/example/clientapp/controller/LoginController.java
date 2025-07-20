@@ -1,11 +1,11 @@
 package com.example.clientapp.controller;
 
 import com.example.clientapp.config.OAuth2Properties;
+import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -16,12 +16,16 @@ public class LoginController {
     OAuth2Properties properties;
 
     @GetMapping("/")
-    String home() {
+    String home(Model model, HttpSession session) {
+        String code = (String) session.getAttribute("code");
+        if(code != null ) {
+            model.addAttribute("code",code);
+        }
         return "home";
     }
 
     @GetMapping("/oauth2/login")
-    RedirectView oauth2Login() {
+    RedirectView oauth2Login(HttpSession session) {
 
         String authServerUrl = properties.getServer().getAuthorizationUri();
         String clientId = properties.getClient().getClientId();
@@ -35,13 +39,10 @@ public class LoginController {
                 .queryParam("scope", scope)
                 .toUriString();
 
-        return new RedirectView(redirectUrl);
-    }
+        session.setAttribute("redirect_uri",redirectUri);
+        session.setAttribute("scope",scope);
 
-    @GetMapping("/oauth2/callback")
-    String oauthCallback(@RequestParam String code, Model model) {
-        model.addAttribute("code",code);
-        return "home";
+        return new RedirectView(redirectUrl);
     }
 
 }

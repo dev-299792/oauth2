@@ -29,5 +29,6 @@ public class OAuth2Properties {
     @Getter
     public static class Server {
         private String authorizationUri;
+        private String accessTokenUri;
     }
 }
