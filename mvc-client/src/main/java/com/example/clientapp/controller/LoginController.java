@@ -3,7 +3,9 @@ package com.example.clientapp.controller;
 import com.example.clientapp.config.OAuth2Properties;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -34,6 +36,12 @@ public class LoginController {
                 .toUriString();
 
         return new RedirectView(redirectUrl);
+    }
+
+    @GetMapping("/oauth2/callback")
+    String oauthCallback(@RequestParam String code, Model model) {
+        model.addAttribute("code",code);
+        return "home";
     }
 
 }

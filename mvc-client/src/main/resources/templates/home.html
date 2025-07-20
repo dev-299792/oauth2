@@ -6,9 +6,15 @@
 </head>
 <body>
 
+<div th:unless="${code}">
     <form th:action="@{/oauth2/login}" method="get">
-        <button type="submit">Login using SecureLogin</button>
+        <button type="submit">Authorize using SecureLogin</button>
     </form>
+</div>
+
+<div th:if="${code}">
+    <p>auth code generated : <span th:text="${code}"></span></p>
+</div>
 
 </body>
 </html>
