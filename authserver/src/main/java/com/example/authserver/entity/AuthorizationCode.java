@@ -1,0 +1,63 @@
+package com.example.authserver.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+
+@Entity
+@Table(name = "authorization_code")
+@Setter
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AuthorizationCode {
+
+    @Id
+    @Column(length = 255)
+    private String code;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_id", nullable = false, foreignKey = @ForeignKey(name = "fk_client_id"))
+    private Client client;
+
+    @Column(nullable = false, length = 100)
+    private String username;
+
+    @Column(name = "redirect_uri", length = 255)
+    private String redirectUri;
+
+    @Column(length = 255)
+    private String scopes;
+
+    @Column(name = "expires_at", nullable = false)
+    private LocalDateTime expiresAt;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+        expiresAt = createdAt.plusMinutes(5);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AuthorizationCode authorizationCode = (AuthorizationCode) o;
+        return Objects.equals(code, authorizationCode.code);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(code);
+    }
+}
+
