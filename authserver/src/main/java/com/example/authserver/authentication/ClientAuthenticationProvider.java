@@ -8,6 +8,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 public class ClientAuthenticationProvider implements AuthenticationProvider {
 
     private final ClientRepository clientRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -25,7 +27,7 @@ public class ClientAuthenticationProvider implements AuthenticationProvider {
         Client client = clientRepository.findClientByClientId(clientId)
                 .orElseThrow(() -> new BadCredentialsException("Invalid client credentials"));
 
-        if (clientSecret!=null && clientSecret.equals(client.getClientSecret())) {
+        if (passwordEncoder.matches(clientSecret,client.getClientSecret())) {
             return new UsernamePasswordAuthenticationToken(clientId, null,null);
         }
 

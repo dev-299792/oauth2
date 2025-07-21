@@ -8,6 +8,10 @@ import com.example.authserver.enums.GrantType;
 import com.example.authserver.repository.AccessTokenRepository;
 import com.example.authserver.repository.AuthorizationCodeRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +24,7 @@ public class AccessTokenService {
 
     private final AccessTokenRepository accessTokenRepository;
     private final AuthorizationCodeRepository authorizationCodeRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public AccessToken generateAccessToken(AccessTokenRequestDTO requestDTO) {
@@ -35,8 +40,7 @@ public class AccessTokenService {
 
         if(client==null) return null;
 
-        if(nullOrNotEqual(requestDTO.getClient_id(), client.getClientId()) ||
-                nullOrNotEqual(requestDTO.getClient_secret(), client.getClientSecret()) ||
+        if(nullOrNotEqual(getClientIdOfAuthenticatedClientId(), client.getClientId()) ||
                 nullOrNotEqual(requestDTO.getRedirect_uri(), requestDTO.getRedirect_uri()) ||
             !GrantType.AUTHORIZATION_CODE.getCode().equals(requestDTO.getGrant_type())
         ) {
@@ -60,6 +64,11 @@ public class AccessTokenService {
 
     private boolean nullOrNotEqual(Object o1, Object o2) {
         return (o1 == null) || (o2 == null) || !Objects.equals(o1, o2);
+    }
+
+    private String getClientIdOfAuthenticatedClientId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return  (String) auth.getPrincipal();
     }
 
 }

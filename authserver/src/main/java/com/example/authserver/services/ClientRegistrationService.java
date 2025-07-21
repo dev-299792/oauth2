@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -23,6 +24,7 @@ import java.util.UUID;
 public class ClientRegistrationService {
 
     private final ClientRepository clientRepository;
+    private final PasswordEncoder encoder;
 
     public List<Client> getAllClientsOfCurrentUser() {
         String username = getAuthenticatedUsername();
@@ -49,7 +51,7 @@ public class ClientRegistrationService {
                 .builder()
                 .clientId(clientId)
                 .clientName(clientRegRequest.getClientName())
-                .clientSecret(secret)
+                .clientSecret(encoder.encode(secret))
                 .redirectUris(clientRegRequest.getRedirectUri())
                 .createdBy(getAuthenticatedUsername())
                 .build();
@@ -59,7 +61,9 @@ public class ClientRegistrationService {
 
         client = clientRepository.save(client);
 
-        return new ClientRegResponseDTO(client);
+        ClientRegResponseDTO dto = new ClientRegResponseDTO(client);
+        dto.setClientSecret(secret);
+        return dto;
     }
 
     private String getAuthenticatedUsername() {
