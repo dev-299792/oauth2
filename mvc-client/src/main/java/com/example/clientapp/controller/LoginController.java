@@ -1,6 +1,9 @@
 package com.example.clientapp.controller;
 
 import com.example.clientapp.config.OAuth2Properties;
+import com.example.clientapp.util.SecurityUtil;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -25,22 +28,24 @@ public class LoginController {
     }
 
     @GetMapping("/oauth2/login")
-    RedirectView oauth2Login(HttpSession session) {
+    RedirectView oauth2Login(HttpServletResponse response) {
 
         String authServerUrl = properties.getServer().getAuthorizationUri();
         String clientId = properties.getClient().getClientId();
         String redirectUri = properties.getClient().getRedirectUri();
         String scope = "profile";
 
+        String state = SecurityUtil.generateRandomState();
+        Cookie cookie = new Cookie("state",state);
+        response.addCookie(cookie);
+
         String redirectUrl = UriComponentsBuilder.fromUriString(authServerUrl)
                 .queryParam("response_type", "code")
                 .queryParam("client_id", clientId)
                 .queryParam("redirect_uri", redirectUri)
                 .queryParam("scope", scope)
+                .queryParam("state",state)
                 .toUriString();
-
-        session.setAttribute("redirect_uri",redirectUri);
-        session.setAttribute("scope",scope);
 
         return new RedirectView(redirectUrl);
     }

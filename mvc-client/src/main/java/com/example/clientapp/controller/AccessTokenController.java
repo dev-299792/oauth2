@@ -10,8 +10,8 @@ import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
@@ -23,7 +23,15 @@ public class AccessTokenController {
     private final ObjectMapper mapper;
 
     @GetMapping("/oauth2/callback")
-    String oauthCallback(@RequestParam String code, Model model, HttpSession session) throws JsonProcessingException {
+    String oauthCallback(@RequestParam String code,
+                         @RequestParam String state,
+                         @CookieValue("state") String stateCookie,
+                         HttpSession session,
+                         Model model) throws JsonProcessingException
+    {
+        if(stateCookie == null || !stateCookie.equals(state)) {
+            throw new RuntimeException("Error in validation.");
+        }
 
         AccessTokenRequestDTO dto = AccessTokenRequestDTO
                 .builder()
