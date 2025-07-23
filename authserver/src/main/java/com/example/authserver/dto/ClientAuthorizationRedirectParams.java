@@ -8,4 +8,5 @@ public class ClientAuthorizationRedirectParams {
     String response_type;
     String redirect_uri;
     String scope;
+    String state;
 }

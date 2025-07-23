@@ -24,6 +24,7 @@ public class AuthorizationController {
         String redirectUri = UriComponentsBuilder
                 .fromUriString(params.getRedirect_uri())
                 .queryParam("code",authorizationCode)
+                .queryParam("state",params.getState())
                 .toUriString();
 
         return new RedirectView(redirectUri);
