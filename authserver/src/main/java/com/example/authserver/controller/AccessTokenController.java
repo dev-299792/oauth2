@@ -8,10 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/oauth2")
@@ -20,8 +17,8 @@ public class AccessTokenController {
 
     private final AccessTokenService accessTokenService;
 
-    @PostMapping("token")
-    ResponseEntity<AccessTokenResponseDTO> generateAccessToken(@RequestBody AccessTokenRequestDTO requestDTO) {
+    @PostMapping(value = "token",consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE )
+    ResponseEntity<AccessTokenResponseDTO> generateAccessToken(@ModelAttribute AccessTokenRequestDTO requestDTO) {
 
         AccessToken token = accessTokenService.generateAccessToken(requestDTO);
 
