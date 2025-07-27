@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${errorTitle ?: 'Error'}"></title>
+</head>
+<body>
+<div>
+    <h1 th:text="${errorTitle ?: 'An Error Occurred'}">An Error Occurred</h1>
+    <p th:text="${errorMessage ?: 'Something went wrong on our end. Please try again later.'}">
+        Something went wrong on our end. Please try again later.
+    </p>
+    <div th:if="${statusCode}">
+        Status Code: <span th:text="${statusCode}">500</span>
+    </div>
+    <a href="/">
+        Go to Homepage
+    </a>
+</div>
+</body>
+</html>
