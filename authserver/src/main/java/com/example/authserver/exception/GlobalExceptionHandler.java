@@ -12,13 +12,13 @@ import org.springframework.web.context.request.WebRequest;
 import jakarta.servlet.http.HttpServletRequest;
 
 @ControllerAdvice
-public class DefaultExceptionHandler {
+public class GlobalExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultExceptionHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) // Sets HTTP status to 500
-    public String handleAllUncaughtException(Exception ex, WebRequest request, Model model, HttpServletRequest httpServletRequest) {
+    public String defaultExceptionHandler(Exception ex, WebRequest request, Model model, HttpServletRequest httpServletRequest) {
         logger.error("An unexpected error occurred during request processing for URI: {}", httpServletRequest.getRequestURI(), ex);
 
         model.addAttribute("errorMessage", "An unexpected error occurred. We are working to fix it. Please try again later.");
@@ -27,4 +27,7 @@ public class DefaultExceptionHandler {
 
         return "error";
     }
+
+
+
 }
