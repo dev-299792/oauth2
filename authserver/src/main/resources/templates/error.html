@@ -5,10 +5,13 @@
 </head>
 <body>
 <div>
-    <h1 th:text="${errorTitle ?: 'An Error Occurred'}">An Error Occurred</h1>
-    <p th:text="${errorMessage ?: 'Something went wrong on our end. Please try again later.'}">
+    <h2 th:text="${errorTitle ?: 'An Error Occurred'}">An Error Occurred</h2>
+    <p th:unless="${errorMessageList}" th:text="${errorMessage ?: 'Something went wrong on our end. Please try again later.'}">
         Something went wrong on our end. Please try again later.
     </p>
+    <div th:each="message : ${errorMessageList}">
+         <p th:text="${message}"></p>
+    </div>
     <div th:if="${statusCode}">
         Status Code: <span th:text="${statusCode}">500</span>
     </div>

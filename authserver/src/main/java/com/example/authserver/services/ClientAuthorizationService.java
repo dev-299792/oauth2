@@ -3,6 +3,8 @@ package com.example.authserver.services;
 import com.example.authserver.dto.ClientAuthorizationRedirectParams;
 import com.example.authserver.entity.AuthorizationCode;
 import com.example.authserver.entity.Client;
+import com.example.authserver.exception.InvalidRequestException;
+import com.example.authserver.exception.RedirectBackWithErrorException;
 import com.example.authserver.repository.AuthorizationCodeRepository;
 import com.example.authserver.repository.ClientRepository;
 import lombok.AllArgsConstructor;
@@ -24,7 +26,7 @@ public class ClientAuthorizationService {
 
         Client client = clientRepository.findClientByClientId(params.getClient_id()).orElse(null);
 
-        if (client==null) return null;
+        validateClientDetails(client,params);
 
         AuthorizationCode code = AuthorizationCode
                 .builder()
@@ -44,6 +46,28 @@ public class ClientAuthorizationService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
         return user.getUsername();
+    }
+
+    private void validateClientDetails(Client client, ClientAuthorizationRedirectParams params) {
+
+        if (client==null){
+            throw new InvalidRequestException("Unknown Client.");
+        }
+
+        if (client.getRedirectUrisSet().contains(params.getRedirect_uri())) {
+            throw new InvalidRequestException("Invalid Redirect Uri.");
+        }
+
+        if(!params.getResponse_type().equals("code")) {
+            throw new RedirectBackWithErrorException("Invalid response_type.");
+        }
+
+        for(String scope : params.getScope().split(" ")) {
+            if(scope.isBlank()) continue;
+            if(!client.getScopesSet().contains(scope)) {
+                throw new RedirectBackWithErrorException("Invalid scope.");
+            }
+        }
     }
 
 }
