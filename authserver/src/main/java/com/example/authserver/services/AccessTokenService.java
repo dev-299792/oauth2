@@ -10,7 +10,6 @@ import com.example.authserver.repository.AuthorizationCodeRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +49,7 @@ public class AccessTokenService {
         AccessToken token = AccessToken
                 .builder()
                 .token(UUID.randomUUID().toString())
-                .username(authorizationCode.getUsername())
+                .user_id(authorizationCode.getUser_id())
                 .refreshToken(UUID.randomUUID().toString())
                 .client(client)
                 .scopes("default") // ToDo: handle scope

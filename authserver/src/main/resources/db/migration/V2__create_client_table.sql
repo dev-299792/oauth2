@@ -9,7 +9,7 @@ CREATE TABLE client (
   authorization_grant_types VARCHAR(1000) NOT NULL,
   redirect_uris VARCHAR(1000),
   scopes VARCHAR(1000),
-  created_by VARCHAR(50),
+  created_by VARCHAR(100),
   UNIQUE (client_id),
-  CONSTRAINT fk_client_user FOREIGN KEY (created_by) REFERENCES users(username)
+  CONSTRAINT fk_client_user FOREIGN KEY (created_by) REFERENCES users(id)
 );

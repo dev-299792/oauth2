@@ -1,5 +1,7 @@
 package com.example.authserver.config;
 
+import com.example.authserver.services.UserDetailsServiceImpl;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -11,7 +13,10 @@ import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import javax.sql.DataSource;
 
 @Configuration
+@AllArgsConstructor
 public class SecurityConfig {
+
+    public final UserDetailsServiceImpl userDetailsService;
 
     @Bean
     public JdbcUserDetailsManager userDetailsManager(DataSource dataSource) {
@@ -24,7 +29,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider(UserDetailsService userDetailsService) {
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
         return new DaoAuthenticationProvider(userDetailsService);
     }
 

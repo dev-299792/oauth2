@@ -3,14 +3,15 @@ package com.example.authserver.services;
 import com.example.authserver.dto.ClientAuthorizationRedirectParams;
 import com.example.authserver.entity.AuthorizationCode;
 import com.example.authserver.entity.Client;
+import com.example.authserver.entity.User;
 import com.example.authserver.exception.InvalidRequestException;
 import com.example.authserver.exception.RedirectBackWithErrorException;
 import com.example.authserver.repository.AuthorizationCodeRepository;
 import com.example.authserver.repository.ClientRepository;
+import com.example.authserver.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -21,6 +22,7 @@ public class ClientAuthorizationService {
 
     private final ClientRepository clientRepository;
     private final AuthorizationCodeRepository codeRepository;
+    private final UserRepository userRepository;
 
     public String getAuthorizationCode(ClientAuthorizationRedirectParams params) {
 
@@ -31,7 +33,7 @@ public class ClientAuthorizationService {
         AuthorizationCode code = AuthorizationCode
                 .builder()
                 .code(UUID.randomUUID().toString())
-                .username(getAuthenticatedUsername())
+                .user_id(getAuthenticatedUser().getUser_id())
                 .scopes(params.getScope())
                 .redirectUri(params.getRedirect_uri())
                 .client(client)
@@ -42,10 +44,9 @@ public class ClientAuthorizationService {
         return code.getCode();
     }
 
-    private String getAuthenticatedUsername() {
+    private User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) auth.getPrincipal();
-        return user.getUsername();
+        return (User) auth.getPrincipal();
     }
 
     private void validateClientDetails(Client client, ClientAuthorizationRedirectParams params) {
@@ -54,7 +55,7 @@ public class ClientAuthorizationService {
             throw new InvalidRequestException("Unknown Client.");
         }
 
-        if (client.getRedirectUrisSet().contains(params.getRedirect_uri())) {
+        if (!client.getRedirectUrisSet().contains(params.getRedirect_uri())) {
             throw new InvalidRequestException("Invalid Redirect Uri.");
         }
 

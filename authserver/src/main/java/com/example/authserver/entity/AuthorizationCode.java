@@ -25,7 +25,7 @@ public class AuthorizationCode {
     private Client client;
 
     @Column(nullable = false, length = 100)
-    private String username;
+    private String user_id;
 
     @Column(name = "redirect_uri", length = 255)
     private String redirectUri;

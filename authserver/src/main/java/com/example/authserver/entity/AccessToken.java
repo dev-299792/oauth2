@@ -26,8 +26,8 @@ public class AccessToken {
     @JoinColumn(name = "client_id", referencedColumnName = "id", nullable = false)
     private Client client;
 
-    @Column(name = "username", length = 100, nullable = false)
-    private String username;
+    @Column(name = "user_id", length = 100, nullable = false)
+    private String user_id;
 
     @Column(name = "scopes", length = 255)
     private String scopes;
