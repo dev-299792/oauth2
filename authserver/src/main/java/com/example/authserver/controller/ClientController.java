@@ -39,14 +39,11 @@ public class ClientController {
             model.addAttribute("applicationTypes", ApplicationType.values());
             return "add-client";
         }
-        try {
-            ClientRegResponseDTO responseDTO = clientRegistrationService.registerClient(client);
-            model.addAttribute("generatedClient", PojoHelper.convertToMap(responseDTO));
-            return "add-client";
-        } catch (Exception e) {
-            model.addAttribute("applicationTypes", ApplicationType.values());
-            return "add-client";
-        }
+
+        ClientRegResponseDTO responseDTO = clientRegistrationService.registerClient(client);
+        model.addAttribute("generatedClient", PojoHelper.convertToMap(responseDTO));
+        return "add-client";
+
     }
 
     @GetMapping("/clients")

@@ -15,7 +15,11 @@ public class ClientRegResponseDTO {
 
     public ClientRegResponseDTO(Client client) {
         clientId = client.getClientId();
-        clientSecret = client.getClientSecret();
+        if(client.getClientSecret()!=null && !client.getClientSecret().contains("{")) {
+            clientSecret = client.getClientSecret();
+        } else {
+            clientSecret = null;
+        }
         clientName = client.getClientName();
         redirectUri = client.getRedirectUris();
         clientAuthenticationMethods = client.getClientAuthenticationMethods();

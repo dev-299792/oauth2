@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Authorization Consent</title>
+</head>
+<body>
+<h2>Authorization Consent</h2>
+<p>The application "<span th:text="${clientName}"></span>" wants to access your account.</p>
+<p>It is requesting the following new permissions:</p>
+<form th:action="@{/oauth2/consent}" method="post">
+    <ul>
+        <li th:each="scope : ${newScopes}">
+            <input type="checkbox" th:id="${scope}" name="scopes" th:value="${scope}" checked="checked" />
+            <label th:for="${scope}" th:text="${scope}"></label>
+        </li>
+    </ul>
+    <input type="hidden" name="clientId" th:value="${clientId}" />
+    <button type="submit">Approve</button>
+    <button type="submit" formaction="/oauth2/consent?scopes=">Deny</button>
+</form>
+</body>
+</html>
