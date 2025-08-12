@@ -9,6 +9,8 @@ import com.example.authserver.exception.RedirectBackWithErrorException;
 import com.example.authserver.repository.AuthorizationCodeRepository;
 import com.example.authserver.repository.ClientRepository;
 import com.example.authserver.repository.UserRepository;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -71,4 +73,8 @@ public class ClientAuthorizationService {
         }
     }
 
+    public void validateClientDetails(String clientId, ClientAuthorizationRedirectParams params) {
+        Client client = clientRepository.findClientByClientId(clientId).orElse(null);
+        validateClientDetails(client,params);
+    }
 }

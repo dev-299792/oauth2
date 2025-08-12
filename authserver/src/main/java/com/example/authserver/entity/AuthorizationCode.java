@@ -2,9 +2,11 @@ package com.example.authserver.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Set;
 
 
 @Entity
@@ -45,6 +47,15 @@ public class AuthorizationCode {
             createdAt = LocalDateTime.now();
         }
         expiresAt = createdAt.plusMinutes(5);
+    }
+
+    public Set<String> getScopesSet() {
+        return stringToSet(this.scopes);
+    }
+
+    private Set<String> stringToSet(String delimitedString) {
+        String[] stringArray = StringUtils.delimitedListToStringArray(delimitedString," ");
+        return Set.of(stringArray);
     }
 
     @Override

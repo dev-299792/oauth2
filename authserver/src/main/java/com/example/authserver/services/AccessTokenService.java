@@ -6,6 +6,7 @@ import com.example.authserver.entity.AuthorizationCode;
 import com.example.authserver.entity.Client;
 import com.example.authserver.enums.GrantType;
 import com.example.authserver.exception.InvalidRequestException;
+import com.example.authserver.exception.RedirectBackWithErrorException;
 import com.example.authserver.exception.RestInvalidRequestException;
 import com.example.authserver.repository.AccessTokenRepository;
 import com.example.authserver.repository.AuthorizationCodeRepository;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -47,7 +49,7 @@ public class AccessTokenService {
                 .user_id(authorizationCode.getUser_id())
                 .refreshToken(UUID.randomUUID().toString())
                 .client(client)
-                .scopes("default") // ToDo: handle scope
+                .scopes(requestDTO.getScopes())
                 .build();
 
         token = accessTokenRepository.save(token);
@@ -75,6 +77,20 @@ public class AccessTokenService {
 
         if(!GrantType.AUTHORIZATION_CODE.getCode().equals(requestDTO.getGrant_type())) {
             throw new InvalidRequestException("invalid_grant_type");
+        }
+
+        if(requestDTO.getScopes()==null || requestDTO.getScopes().isBlank()) {
+            throw new InvalidRequestException("scope_absent");
+        }
+
+        String[] requestedScopes = requestDTO.getScopes().split(" ");
+        Set<String> authCodeScopes = authorizationCode.getScopesSet();
+        Set<String> clientScopes = client.getScopesSet();
+        for(String scope : requestedScopes) {
+            if(scope.isBlank()) continue;
+            if(!authCodeScopes.contains(scope) || !clientScopes.contains(scope)) {
+                throw new RedirectBackWithErrorException("Invalid scope.");
+            }
         }
     }
 

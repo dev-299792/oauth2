@@ -1,9 +1,12 @@
 package com.example.authserver.controller;
 
 import com.example.authserver.dto.ClientAuthorizationRedirectParams;
+import com.example.authserver.entity.Client;
+import com.example.authserver.exception.InvalidRequestException;
 import com.example.authserver.exception.RedirectBackWithErrorException;
 import com.example.authserver.services.AuthorizationConsentService;
 import com.example.authserver.services.ClientAuthorizationService;
+import com.example.authserver.services.ClientRegistrationService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -26,6 +29,9 @@ public class AuthorizationController {
     @GetMapping("/oauth2/authorize")
     RedirectView authorize(@Validated @ModelAttribute ClientAuthorizationRedirectParams params,
                            HttpSession session) {
+
+        // validating request before asking for user consent
+        authorizationService.validateClientDetails(params.getClient_id(),params);
 
         if(!consentService.consentExistsForScope(params.getClient_id(), params.getScope())) {
             session.setAttribute("clientAuthorizationRequest",params);
