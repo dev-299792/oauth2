@@ -16,6 +16,7 @@ public class AccessTokenResponseDTO {
     private Long expires_in; // Use Long for expires_in as it's a duration in seconds
     private String refresh_token;
     private String scope;
+    private String tokenType;
 
     public static AccessTokenResponseDTO getDTO(AccessToken token) {
 
@@ -27,6 +28,7 @@ public class AccessTokenResponseDTO {
                 .refresh_token(token.getRefreshToken())
                 .scope(token.getScopes())
                 .expires_in(duration.getSeconds())
+                .tokenType("Bearer") // ToDo: remove hardcode token typed
                 .build();
     }
 
