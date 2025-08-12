@@ -23,7 +23,8 @@ public class AccessTokenController {
     private final ObjectMapper mapper;
 
     @GetMapping("/oauth2/callback")
-    String oauthCallback(@RequestParam String code,
+    String oauthCallback(@RequestParam(required = false) String code,
+                         @RequestParam(required = false) String error,
                          @RequestParam String state,
                          @CookieValue("state") String stateCookie,
                          HttpSession session,
@@ -31,6 +32,10 @@ public class AccessTokenController {
     {
         if(stateCookie == null || !stateCookie.equals(state)) {
             throw new RuntimeException("Error in validation.");
+        }
+
+        if(error != null) {
+            throw new RuntimeException(error);
         }
 
         AccessTokenRequestDTO dto = AccessTokenRequestDTO
