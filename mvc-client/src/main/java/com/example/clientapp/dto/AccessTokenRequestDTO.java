@@ -11,4 +11,5 @@ public class AccessTokenRequestDTO {
     private String client_secret;
     private String grant_type;
     private String redirect_uri;
+    private String scopes;
 }

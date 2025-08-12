@@ -44,6 +44,7 @@ public class AccessTokenController {
                 .client_secret(oAuth2Properties.getClient().getClientSecret())
                 .code(code)
                 .grant_type("authorization_code")
+                .scopes("profile")
                 .redirect_uri(oAuth2Properties.getClient().getRedirectUri())
                 .build();
 
