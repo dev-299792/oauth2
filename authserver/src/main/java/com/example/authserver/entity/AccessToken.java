@@ -35,6 +35,9 @@ public class AccessToken {
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
 
+    @Column(name = "refresh_token_expires_at", nullable = false)
+    private LocalDateTime refreshTokenExpiresAt;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
@@ -44,7 +47,8 @@ public class AccessToken {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
         }
-        expiresAt = createdAt.plusMinutes(30);
+        expiresAt = createdAt.plusMinutes(5);
+        refreshTokenExpiresAt = createdAt.plusMinutes(30);
     }
 
     @Override

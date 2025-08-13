@@ -8,4 +8,5 @@ public class AccessTokenRequestDTO {
     private String grant_type;
     private String redirect_uri;
     private String scopes;
+    private String refresh_token;
 }

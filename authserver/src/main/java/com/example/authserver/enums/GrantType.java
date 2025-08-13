@@ -6,4 +6,13 @@ public enum GrantType {
     public String getCode() {
         return this.name().toLowerCase();
     }
+
+    public static GrantType valueOfNullable(String name) {
+        for (GrantType grantType : GrantType.values()) {
+            if (grantType.name().equalsIgnoreCase(name)) {
+                return grantType;
+            }
+        }
+        return null;
+    }
 }

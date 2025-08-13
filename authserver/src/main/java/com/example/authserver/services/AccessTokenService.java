@@ -6,7 +6,6 @@ import com.example.authserver.entity.AuthorizationCode;
 import com.example.authserver.entity.Client;
 import com.example.authserver.enums.GrantType;
 import com.example.authserver.exception.InvalidRequestException;
-import com.example.authserver.exception.RedirectBackWithErrorException;
 import com.example.authserver.exception.RestInvalidRequestException;
 import com.example.authserver.repository.AccessTokenRepository;
 import com.example.authserver.repository.AuthorizationCodeRepository;
@@ -17,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -31,31 +31,107 @@ public class AccessTokenService {
     @Transactional
     public AccessToken generateAccessToken(AccessTokenRequestDTO requestDTO) {
 
-        AuthorizationCode authorizationCode =
-                authorizationCodeRepository
-                        .findById(requestDTO.getCode())
-                        .orElse(null);
-
-        Client client=null;
-        if(authorizationCode!=null) {
-            client = authorizationCode.getClient();
+        GrantType grantType;
+        try {
+            grantType = GrantType.valueOf(requestDTO.getGrant_type().toUpperCase());
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new InvalidRequestException("unsupported_grant_type");
         }
 
-        validateAccessTokenRequest(requestDTO,authorizationCode,client);
+        switch (grantType) {
+            case AUTHORIZATION_CODE -> {
+                return generateForAuthorizationCode(requestDTO);
+            }
+            case REFRESH_TOKEN -> {
+                return generateForRefreshToken(requestDTO);
+            }
+//            case CLIENT_CREDENTIALS ->  {
+//                 ToDo: implement client credentials
+//            }
+            default -> throw new InvalidRequestException("unsupported_grant_type");
+        }
+    }
 
+    private AccessToken createAccessToken(String userId, Client client, String scopes) {
         AccessToken token = AccessToken
                 .builder()
                 .token(UUID.randomUUID().toString())
-                .user_id(authorizationCode.getUser_id())
+                .user_id(userId)
                 .refreshToken(UUID.randomUUID().toString())
                 .client(client)
-                .scopes(requestDTO.getScopes())
+                .scopes(scopes)
                 .build();
+        return accessTokenRepository.save(token);
+    }
 
-        token = accessTokenRepository.save(token);
-        authorizationCodeRepository.delete(authorizationCode);
+    private AccessToken generateForAuthorizationCode(AccessTokenRequestDTO requestDTO) {
+        AuthorizationCode authorizationCode =
+                authorizationCodeRepository
+                        .findById(requestDTO.getCode())
+                        .orElseThrow(() ->
+                                new InvalidRequestException("invalid_request"));
 
-        return token;
+        try {
+            Client client = null;
+            if (authorizationCode != null) {
+                client = authorizationCode.getClient();
+            }
+            validateAccessTokenRequest(requestDTO, authorizationCode, client);
+            return createAccessToken(authorizationCode.getUser_id(), client, requestDTO.getScopes());
+        } finally {
+            if(authorizationCode!=null) {
+                authorizationCodeRepository.delete(authorizationCode);
+            }
+        }
+
+    }
+
+    private AccessToken generateForRefreshToken(AccessTokenRequestDTO requestDTO) {
+        AccessToken oldToken = accessTokenRepository.findByRefreshToken(requestDTO.getRefresh_token())
+                .orElseThrow(() -> new RestInvalidRequestException("invalid_refresh_token"));
+
+        try {
+            validateRefreshTokenRequest(oldToken,requestDTO);
+
+            AccessToken newToken = AccessToken.builder()
+                    .token(UUID.randomUUID().toString())
+                    .user_id(oldToken.getUser_id())
+                    .refreshToken(UUID.randomUUID().toString())
+                    .client(oldToken.getClient())
+                    .scopes(oldToken.getScopes())
+                    .build();
+
+           return accessTokenRepository.save(newToken);
+        } finally {
+            oldToken.setRefreshTokenExpiresAt(LocalDateTime.now().minusHours(1));
+            accessTokenRepository.save(oldToken);
+        }
+    }
+
+    private void validateRefreshTokenRequest(AccessToken oldToken, AccessTokenRequestDTO requestDTO) {
+
+        String clientId = getClientIdOfAuthenticatedClientId();
+        Client client = oldToken.getClient();
+        if(client==null || !client.getClientId().equals(clientId)) {
+            throw new RestInvalidRequestException("invalid_request");
+        }
+
+        if(oldToken.getRefreshTokenExpiresAt().isBefore(LocalDateTime.now()) ) {
+            throw new RestInvalidRequestException("refresh_token_expired");
+        }
+
+        if(requestDTO.getScopes() == null || requestDTO.getScopes().isBlank()) {
+            throw new RestInvalidRequestException("invalid_scope");
+        }
+
+        String[] requestedScopes = requestDTO.getScopes().split(" ");
+        Set<String> oldTokenScopes = Set.of(oldToken.getScopes().split(" "));
+        for(String scope : requestedScopes) {
+            if(scope.isBlank()) continue;
+            if(!oldTokenScopes.contains(scope)) {
+                throw new RestInvalidRequestException("invalid_scope");
+            }
+        }
     }
 
     private void validateAccessTokenRequest(AccessTokenRequestDTO requestDTO, AuthorizationCode authorizationCode, Client client) {
@@ -64,8 +140,8 @@ public class AccessTokenService {
             throw new RestInvalidRequestException("invalid_request");
         }
 
-        if(authorizationCode==null) {
-            throw new RestInvalidRequestException("invalid_grant");
+        if(authorizationCode.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new RestInvalidRequestException("code_expired");
         }
 
         if(requestDTO.getRedirect_uri() == null ||
@@ -73,10 +149,6 @@ public class AccessTokenService {
                 !requestDTO.getRedirect_uri().equals(authorizationCode.getRedirectUri())
         ) {
             throw new RestInvalidRequestException("invalid_redirect_uri");
-        }
-
-        if(!GrantType.AUTHORIZATION_CODE.getCode().equals(requestDTO.getGrant_type())) {
-            throw new InvalidRequestException("invalid_grant_type");
         }
 
         if(requestDTO.getScopes()==null || requestDTO.getScopes().isBlank()) {
@@ -89,7 +161,7 @@ public class AccessTokenService {
         for(String scope : requestedScopes) {
             if(scope.isBlank()) continue;
             if(!authCodeScopes.contains(scope) || !clientScopes.contains(scope)) {
-                throw new RedirectBackWithErrorException("Invalid scope.");
+                throw new InvalidRequestException("invalid_scope");
             }
         }
     }
