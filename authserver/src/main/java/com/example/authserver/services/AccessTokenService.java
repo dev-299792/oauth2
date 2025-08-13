@@ -10,13 +10,15 @@ import com.example.authserver.exception.RestInvalidRequestException;
 import com.example.authserver.repository.AccessTokenRepository;
 import com.example.authserver.repository.AuthorizationCodeRepository;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -26,7 +28,7 @@ public class AccessTokenService {
 
     private final AccessTokenRepository accessTokenRepository;
     private final AuthorizationCodeRepository authorizationCodeRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     @Transactional
     public AccessToken generateAccessToken(AccessTokenRequestDTO requestDTO) {
@@ -53,9 +55,19 @@ public class AccessTokenService {
     }
 
     private AccessToken createAccessToken(String userId, Client client, String scopes) {
+
+        // 5 minutes from now
+        Date expiresAt = new Date( new Date().getTime() + 5 * 60 * 1000 );
+
+        var claims = Map.of(
+                "client_id",client.getClientId(),
+                "scopes",scopes
+        );
+        String jwtToken = jwtService.generateToken(userId, expiresAt, claims);
+
         AccessToken token = AccessToken
                 .builder()
-                .token(UUID.randomUUID().toString())
+                .token(jwtToken)
                 .user_id(userId)
                 .refreshToken(UUID.randomUUID().toString())
                 .client(client)
@@ -83,7 +95,6 @@ public class AccessTokenService {
                 authorizationCodeRepository.delete(authorizationCode);
             }
         }
-
     }
 
     private AccessToken generateForRefreshToken(AccessTokenRequestDTO requestDTO) {
@@ -92,16 +103,8 @@ public class AccessTokenService {
 
         try {
             validateRefreshTokenRequest(oldToken,requestDTO);
+            return createAccessToken(oldToken.getUser_id(), oldToken.getClient(), requestDTO.getScopes());
 
-            AccessToken newToken = AccessToken.builder()
-                    .token(UUID.randomUUID().toString())
-                    .user_id(oldToken.getUser_id())
-                    .refreshToken(UUID.randomUUID().toString())
-                    .client(oldToken.getClient())
-                    .scopes(oldToken.getScopes())
-                    .build();
-
-           return accessTokenRepository.save(newToken);
         } finally {
             oldToken.setRefreshTokenExpiresAt(LocalDateTime.now().minusHours(1));
             accessTokenRepository.save(oldToken);
