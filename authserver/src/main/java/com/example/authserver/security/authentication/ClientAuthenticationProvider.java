@@ -1,4 +1,4 @@
-package com.example.authserver.authentication;
+package com.example.authserver.security.authentication;
 
 import com.example.authserver.entity.Client;
 import com.example.authserver.repository.ClientRepository;

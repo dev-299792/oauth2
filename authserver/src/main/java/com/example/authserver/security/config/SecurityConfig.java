@@ -1,4 +1,4 @@
-package com.example.authserver.config;
+package com.example.authserver.security.config;
 
 import com.example.authserver.services.UserDetailsServiceImpl;
 import lombok.AllArgsConstructor;
