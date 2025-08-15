@@ -3,7 +3,6 @@ package com.example.authserver.controller;
 import com.example.authserver.dto.ClientRegRequestDTO;
 import com.example.authserver.dto.ClientRegResponseDTO;
 import com.example.authserver.enums.ApplicationType;
-import com.example.authserver.enums.GrantType;
 import com.example.authserver.helper.PojoHelper;
 import com.example.authserver.services.ClientRegistrationService;
 import jakarta.validation.Valid;

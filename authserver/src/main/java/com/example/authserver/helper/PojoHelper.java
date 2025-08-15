@@ -1,11 +1,17 @@
 package com.example.authserver.helper;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 public class PojoHelper {
+
+    private static final Logger logger = LoggerFactory.getLogger(PojoHelper.class);
 
     public static Map<String, String> convertToMap(Object object) {
         Map<String, String> fieldMap = new LinkedHashMap<>();
@@ -17,7 +23,7 @@ public class PojoHelper {
                     fieldMap.put(camelCaseToDisplayName(field.getName()), String.valueOf(field.get(object)));
             }
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return fieldMap;
     }

@@ -11,7 +11,6 @@ import com.example.authserver.repository.AccessTokenRepository;
 import com.example.authserver.repository.AuthorizationCodeRepository;
 import com.example.authserver.security.authentication.PkceAutheticationToken;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
