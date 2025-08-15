@@ -1,27 +1,135 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="https://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureLogin Client</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Custom CSS for better UX -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        /* Custom styling for the JSON code block */
+        .code-block {
+            background-color: #e9ecef;
+            border-radius: 0.25rem;
+            padding: 1rem;
+            /* Fix to enable wrapping and remove horizontal scrollbar */
+            white-space: pre-wrap;
+            word-break: break-all;
+            overflow-x: auto;
+        }
+    </style>
 </head>
 <body>
 
-<div th:unless="${code}">
-    <form th:action="@{/oauth2/login}" method="get">
-        <button type="submit">Authorize using SecureLogin</button>
-    </form>
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">SecureLogin Client App</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contact</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content Container -->
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+            <!-- Content when no code is present -->
+            <div class="card p-4 text-center" th:unless="${code}">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">Authorize with SecureLogin</h2>
+                    <p class="card-text">
+                        Click the button below to authorize this application using your SecureLogin account.
+                    </p>
+                    <form th:action="@{/oauth2/login}" method="get">
+                        <button type="submit" class="btn btn-primary btn-lg mt-3">Authorize using SecureLogin</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Content when a code is present -->
+            <div class="card p-4" th:if="${code}">
+                <div class="card-body">
+                    <h2 class="card-title mb-3">Authorization Successful!</h2>
+                    <p>
+                        Your access token has been retrieved. You can now use it to make API calls on your behalf.
+                    </p>
+                    <div class="alert alert-success mt-3" role="alert">
+                        <strong>Access Token:</strong>
+                        <pre class="code-block"><code id="accessTokenCode" th:utext="${code}"></code></pre>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <form th:action="@{/clear-token}" method="get">
+                            <button type="submit" class="btn btn-danger btn-block">Delete Access Token</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
 
-<div th:if="${code}">
-    <p>Access Token retrieved : <span th:text="${code}"></span></p>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
-    <br/>
+<!-- JavaScript to format the JSON string -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Find the code block element
+        const codeElement = document.getElementById('accessTokenCode');
 
-    <form th:action="@{/clear-token}" method="get">
-        <button type="submit">Delete Access Token</button>
-    </form>
-</div>
-
+        // Check if the element exists and has content
+        if (codeElement && codeElement.textContent) {
+            try {
+                // Parse the JSON string
+                const jsonObject = JSON.parse(codeElement.textContent);
+                // Stringify with indentation for formatting
+                const formattedJson = JSON.stringify(jsonObject, null, 2);
+                // Update the element with the formatted text
+                codeElement.textContent = formattedJson;
+            } catch (e) {
+                // If it's not valid JSON, do nothing and just display the plain text
+                console.error("The access token is not a valid JSON string. Displaying as plain text.", e);
+            }
+        }
+    });
+</script>
 
 </body>
 </html>
