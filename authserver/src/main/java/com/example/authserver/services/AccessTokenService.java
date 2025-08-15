@@ -9,6 +9,7 @@ import com.example.authserver.exception.InvalidRequestException;
 import com.example.authserver.exception.RestInvalidRequestException;
 import com.example.authserver.repository.AccessTokenRepository;
 import com.example.authserver.repository.AuthorizationCodeRepository;
+import com.example.authserver.security.authentication.PkceAutheticationToken;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.Authentication;
@@ -90,7 +91,8 @@ public class AccessTokenService {
             }
             validateAccessTokenRequest(requestDTO, authorizationCode, client);
             return createAccessToken(authorizationCode.getUser_id(), client, requestDTO.getScopes());
-        } finally {
+        }
+        finally {
             if(authorizationCode!=null) {
                 authorizationCodeRepository.delete(authorizationCode);
             }
@@ -143,6 +145,12 @@ public class AccessTokenService {
             throw new RestInvalidRequestException("invalid_request");
         }
 
+        if(authorizationCode.getCodeChallenge() != null &&
+                !authorizationCode.getCodeChallenge().isBlank() &&
+                !isPkceVerified()) {
+            throw new RestInvalidRequestException("invalid_request");
+        }
+
         if(authorizationCode.getExpiresAt().isBefore(LocalDateTime.now())) {
             throw new RestInvalidRequestException("code_expired");
         }
@@ -173,4 +181,10 @@ public class AccessTokenService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return  (String) auth.getPrincipal();
     }
+
+    private boolean isPkceVerified() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth instanceof PkceAutheticationToken;
+    }
+
 }

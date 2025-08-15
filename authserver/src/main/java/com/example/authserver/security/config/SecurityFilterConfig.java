@@ -1,6 +1,8 @@
 package com.example.authserver.security.config;
 
 import com.example.authserver.security.authentication.ClientAuthenticationProvider;
+import com.example.authserver.security.authentication.PkceAuthenticationProvider;
+import com.example.authserver.security.filter.PkceAccessTokenRequestAuthenticationFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +21,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityFilterConfig {
 
     private final ClientAuthenticationProvider clientAuthenticationProvider;
+    private final PkceAuthenticationProvider pkceAuthenticationProvider;
     private final DaoAuthenticationProvider daoAuthenticationProvider;
+    private final PkceAccessTokenRequestAuthenticationFilter pkceAuthenticationFilter;
 
     @Bean
     @Order(1)
@@ -27,6 +31,9 @@ public class SecurityFilterConfig {
         http
                 .securityMatcher("/api/**")
                 .csrf(csrf -> csrf.disable())
+                .addFilterBefore(pkceAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class)
+                .authenticationProvider(pkceAuthenticationProvider)
                 .authenticationProvider(clientAuthenticationProvider)
                 .authorizeHttpRequests( authorize ->
                         authorize.anyRequest().authenticated())

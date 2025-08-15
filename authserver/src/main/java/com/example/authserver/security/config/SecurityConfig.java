@@ -1,9 +1,12 @@
 package com.example.authserver.security.config;
 
+import com.example.authserver.security.filter.PkceAccessTokenRequestAuthenticationFilter;
 import com.example.authserver.services.UserDetailsServiceImpl;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;

@@ -41,6 +41,11 @@ public class ClientAuthorizationService {
                 .client(client)
                 .build();
 
+        if(params.getCode_challenge()!=null && !params.getCode_challenge().isBlank()) {
+            code.setCodeChallenge(params.getCode_challenge());
+            code.setCodeChallengeMethod(params.getCode_challenge_method());
+        }
+
         code = codeRepository.save(code);
 
         return code.getCode();

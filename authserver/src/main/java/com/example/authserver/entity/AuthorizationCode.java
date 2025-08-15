@@ -22,7 +22,7 @@ public class AuthorizationCode {
     @Column(length = 255)
     private String code;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "client_id", nullable = false, foreignKey = @ForeignKey(name = "fk_client_id"))
     private Client client;
 
@@ -34,6 +34,12 @@ public class AuthorizationCode {
 
     @Column(length = 255)
     private String scopes;
+
+    @Column(length = 255)
+    private String codeChallenge;
+
+    @Column(length = 15)
+    private String codeChallengeMethod;
 
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;

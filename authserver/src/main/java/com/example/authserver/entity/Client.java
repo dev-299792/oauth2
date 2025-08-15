@@ -43,6 +43,9 @@ public class Client {
     @Column(name = "client_name", length = 200, nullable = false)
     private String clientName;
 
+    @Column(name = "is_public", nullable = false)
+    private boolean isPublic;
+
     @Column(name = "client_authentication_methods", length = 1000, nullable = false)
     private String clientAuthenticationMethods;
 
@@ -57,6 +60,10 @@ public class Client {
 
     @Column(name = "created_by", length = 50)
     private String createdBy;
+
+    public boolean pkceRequired() {
+        return isPublic;
+    }
 
     public Set<String> getClientAuthenticationMethodsSet() {
         return stringToSet(this.clientAuthenticationMethods);

@@ -24,4 +24,8 @@ public class ClientAuthorizationRedirectParams {
     String scope;
 
     String state;
+
+    String code_challenge;
+
+    String code_challenge_method;
 }
