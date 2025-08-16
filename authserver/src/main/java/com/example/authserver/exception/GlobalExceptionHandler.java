@@ -47,7 +47,6 @@ public class GlobalExceptionHandler {
         return "error";
     }
 
-/* <<<<<<<<<<<<<<  ✨ Windsurf Command ⭐ >>>>>>>>>>>>>>>> */
     /**
      * Handles exceptions of type {@link InvalidRequestException}.
      *
@@ -55,7 +54,6 @@ public class GlobalExceptionHandler {
      * with an error message and status code.
      *
      */
-/* <<<<<<<<<<  eb2c932f-f281-4c3a-9af9-176fdcc6f602  >>>>>>>>>>> */
     @ExceptionHandler(InvalidRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST) // Sets HTTP status to 400
     public ModelAndView invalidRequestHandler(Exception ex, WebRequest request, Model model, HttpServletRequest httpServletRequest) {
@@ -68,7 +66,6 @@ public class GlobalExceptionHandler {
         return new ModelAndView("error");
     }
 
-/* <<<<<<<<<<<<<<  ✨ Windsurf Command ⭐ >>>>>>>>>>>>>>>> */
     /**
      * Handles exceptions of type {@link MethodArgumentNotValidException}.
      *
@@ -94,7 +91,6 @@ public class GlobalExceptionHandler {
         return new ModelAndView("error");
     }
 
-/* <<<<<<<<<<<<<<  ✨ Windsurf Command ⭐ >>>>>>>>>>>>>>>> */
     /**
      * Handles exceptions of type {@link RestInvalidRequestException}.
      *
@@ -103,7 +99,6 @@ public class GlobalExceptionHandler {
      * thrown by REST API endpoints.
      *
      */
-/* <<<<<<<<<<  77fe1b80-4531-41b2-8c4f-dba89a8e2a21  >>>>>>>>>>> */
     @ExceptionHandler(RestInvalidRequestException.class)
     public ResponseEntity<ErrorResponse> handleRestInvalidRequestException(RestInvalidRequestException ex) {
         logger.error("REST API invalid request received: {}", ex.getMessage());
