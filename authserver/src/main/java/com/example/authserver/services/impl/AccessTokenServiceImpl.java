@@ -1,6 +1,7 @@
 package com.example.authserver.services.impl;
 
 import com.example.authserver.dto.AccessTokenRequestDTO;
+import com.example.authserver.dto.AccessTokenResponseDTO;
 import com.example.authserver.entity.AccessToken;
 import com.example.authserver.entity.AuthorizationCode;
 import com.example.authserver.entity.Client;
@@ -18,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Map;
@@ -33,7 +35,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     private final JwtService jwtService;
 
     @Transactional
-    public AccessToken generateAccessToken(AccessTokenRequestDTO requestDTO) {
+    public AccessTokenResponseDTO generateAccessToken(AccessTokenRequestDTO requestDTO) {
 
         GrantType grantType;
         try {
@@ -42,18 +44,13 @@ public class AccessTokenServiceImpl implements AccessTokenService {
             throw new InvalidRequestException("unsupported_grant_type");
         }
 
-        switch (grantType) {
-            case AUTHORIZATION_CODE -> {
-                return generateForAuthorizationCode(requestDTO);
-            }
-            case REFRESH_TOKEN -> {
-                return generateForRefreshToken(requestDTO);
-            }
-//            case CLIENT_CREDENTIALS ->  {
-//                 ToDo: implement client credentials
-//            }
+        AccessToken token = switch (grantType) {
+            case AUTHORIZATION_CODE -> generateForAuthorizationCode(requestDTO);
+            case REFRESH_TOKEN -> generateForRefreshToken(requestDTO);
+            //case CLIENT_CREDENTIALS ->  ToDo: implement client credentials
             default -> throw new InvalidRequestException("unsupported_grant_type");
-        }
+        };
+        return toResponseDTO(token);
     }
 
     private AccessToken createAccessToken(String userId, Client client, String scopes) {
@@ -176,6 +173,20 @@ public class AccessTokenServiceImpl implements AccessTokenService {
                 throw new InvalidRequestException("invalid_scope");
             }
         }
+    }
+
+    private AccessTokenResponseDTO toResponseDTO(AccessToken token) {
+        Duration accessTokenExp = Duration.between(token.getCreatedAt(), token.getExpiresAt());
+        Duration refreshTokenExp = Duration.between(token.getCreatedAt(), token.getRefreshTokenExpiresAt());
+
+        return AccessTokenResponseDTO.builder()
+                .access_token(token.getToken())
+                .refresh_token(token.getRefreshToken())
+                .scope(token.getScopes())
+                .expires_in(accessTokenExp.getSeconds())
+                .refresh_token_expires_in(refreshTokenExp.getSeconds())
+                .tokenType("Bearer") // ToDo: remove hardcode
+                .build();
     }
 
     private String getClientIdOfAuthenticatedClientId() {

@@ -1,8 +1,8 @@
 package com.example.authserver.services;
 
 import com.example.authserver.dto.AccessTokenRequestDTO;
-import com.example.authserver.entity.AccessToken;
+import com.example.authserver.dto.AccessTokenResponseDTO;
 
 public interface AccessTokenService {
-    AccessToken generateAccessToken(AccessTokenRequestDTO requestDTO);
+    AccessTokenResponseDTO generateAccessToken(AccessTokenRequestDTO requestDTO);
 }

@@ -20,9 +20,7 @@ public class AccessTokenController {
     @PostMapping(value = "token",consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE )
     ResponseEntity<AccessTokenResponseDTO> generateAccessToken(@ModelAttribute AccessTokenRequestDTO requestDTO) {
 
-        AccessToken token = accessTokenService.generateAccessToken(requestDTO);
-
-        AccessTokenResponseDTO dto = AccessTokenResponseDTO.getDTO(token);
+        AccessTokenResponseDTO dto = accessTokenService.generateAccessToken(requestDTO);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

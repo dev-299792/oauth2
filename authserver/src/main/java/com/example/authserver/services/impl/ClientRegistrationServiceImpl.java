@@ -28,9 +28,13 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
         return clientRepository.findClientByClientId(clientId);
     }
 
-    public List<Client> getAllClientsOfCurrentUser() {
+    public List<ClientRegResponseDTO> getAllClientsOfCurrentUser() {
         User user = getAuthenticatedUser();
-        return clientRepository.findClientByCreatedBy(user.getUser_id());
+        return clientRepository
+                .findClientByCreatedBy(user.getUser_id())
+                .stream()
+                .map(this::getClientRegResponseDTO)
+                .toList();
     }
 
     public ClientRegResponseDTO registerClient(ClientRegRequestDTO clientRegRequest) {
@@ -62,13 +66,23 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
 
         client = clientRepository.save(client);
 
-        ClientRegResponseDTO dto = new ClientRegResponseDTO(client);
-        dto.setClientSecret(secret);
+        ClientRegResponseDTO dto = getClientRegResponseDTO(client);
+        dto.setClientSecret(client.getClientSecret());
         return dto;
     }
 
     private User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return  (User) auth.getPrincipal();
+    }
+
+    private ClientRegResponseDTO getClientRegResponseDTO(Client client) {
+        return ClientRegResponseDTO.builder()
+                .clientId(client.getClientId())
+                .clientName(client.getClientName())
+                .redirectUri(client.getRedirectUris())
+                .clientAuthenticationMethods(client.getClientAuthenticationMethods())
+                .authorizationGrantTypes(client.getAuthorizationGrantTypes())
+                .build();
     }
 }

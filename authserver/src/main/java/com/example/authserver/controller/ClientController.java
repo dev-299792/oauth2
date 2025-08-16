@@ -51,7 +51,6 @@ public class ClientController {
         List<Map<String,String>> clients = clientRegistrationService
                 .getAllClientsOfCurrentUser()
                 .stream()
-                .map(ClientRegResponseDTO::new)
                 .map(PojoHelper::convertToMap)
                 .toList();
 

@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface ClientRegistrationService {
     Optional<Client> getClient(String clientId);
-    List<Client> getAllClientsOfCurrentUser();
+    List<ClientRegResponseDTO> getAllClientsOfCurrentUser();
     ClientRegResponseDTO registerClient(ClientRegRequestDTO clientRegRequest);
 }
