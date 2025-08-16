@@ -3,7 +3,6 @@ package com.example.authserver.controller;
 import com.example.authserver.dto.ClientRegRequestDTO;
 import com.example.authserver.dto.ClientRegResponseDTO;
 import com.example.authserver.enums.ApplicationType;
-import com.example.authserver.helper.PojoHelper;
 import com.example.authserver.services.ClientRegistrationService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -40,7 +39,7 @@ public class ClientController {
         }
 
         ClientRegResponseDTO responseDTO = clientRegistrationService.registerClient(client);
-        model.addAttribute("generatedClient", PojoHelper.convertToMap(responseDTO));
+        model.addAttribute("generatedClient", clientRegistrationService.convertClientRegResponseToMap(responseDTO));
         return "add-client";
 
     }
@@ -51,7 +50,7 @@ public class ClientController {
         List<Map<String,String>> clients = clientRegistrationService
                 .getAllClientsOfCurrentUser()
                 .stream()
-                .map(PojoHelper::convertToMap)
+                .map(clientRegistrationService::convertClientRegResponseToMap)
                 .toList();
 
         model.addAttribute("clientList",clients);

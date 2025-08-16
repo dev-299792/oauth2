@@ -71,6 +71,17 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
         return dto;
     }
 
+    public Map<String, String> convertClientRegResponseToMap(ClientRegResponseDTO dto) {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("Client Id", dto.getClientId());
+        map.put("Client Secret", dto.getClientSecret());
+        map.put("Client Name", dto.getClientName());
+        map.put("Redirect Uri", dto.getRedirectUri());
+        map.put("Client Authentication Methods", dto.getClientAuthenticationMethods());
+        map.put("Authorization Grant Types", dto.getAuthorizationGrantTypes());
+        return map;
+    }
+
     private User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return  (User) auth.getPrincipal();
