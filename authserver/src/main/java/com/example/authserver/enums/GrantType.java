@@ -1,5 +1,9 @@
 package com.example.authserver.enums;
 
+/**
+ * Enumeration of all supported OAuth2 grant types.
+ * 
+ */
 public enum GrantType {
     AUTHORIZATION_CODE, CLIENT_CREDENTIALS, REFRESH_TOKEN;
 

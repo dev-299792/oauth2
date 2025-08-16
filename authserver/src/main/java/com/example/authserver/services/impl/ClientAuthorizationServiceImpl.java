@@ -8,7 +8,6 @@ import com.example.authserver.exception.InvalidRequestException;
 import com.example.authserver.exception.RedirectBackWithErrorException;
 import com.example.authserver.repository.AuthorizationCodeRepository;
 import com.example.authserver.repository.ClientRepository;
-import com.example.authserver.repository.UserRepository;
 import com.example.authserver.services.ClientAuthorizationService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;

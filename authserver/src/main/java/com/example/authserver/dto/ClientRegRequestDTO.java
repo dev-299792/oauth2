@@ -7,6 +7,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.URL;
 
+
+/**
+ * DTO for client registration request.
+ */
 @Getter
 @Setter
 public class ClientRegRequestDTO {

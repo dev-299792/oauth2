@@ -11,9 +11,15 @@ import org.springframework.security.provisioning.JdbcUserDetailsManager;
 
 import javax.sql.DataSource;
 
+/**
+ * Configures core authentication beans:
+ * - {@link JdbcUserDetailsManager} for persisting user details in DB
+ * - {@link PasswordEncoder} with delegating strategy
+ * - {@link DaoAuthenticationProvider} for authenticating users
+ */
 @Configuration
 @AllArgsConstructor
-public class SecurityConfig {
+public class UserSecurityConfig {
 
     public final UserDetailsService userDetailsService;
 

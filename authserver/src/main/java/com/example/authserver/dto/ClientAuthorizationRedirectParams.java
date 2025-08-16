@@ -4,6 +4,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+
+/**
+ * DTO for the parameters in the authorization request.
+ *
+ */
 @Data
 public class ClientAuthorizationRedirectParams {
 

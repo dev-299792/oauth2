@@ -8,6 +8,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
 
+/**
+ * User entity.
+ *
+ * <p>Represents a user in the application.
+ */
 @Entity
 @Table(name = "users")
 @Getter

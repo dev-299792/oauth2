@@ -8,6 +8,13 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Set;
 
+
+/**
+ * Represents a consent for an authorization grant.
+ * Consent is a record of the user's decision to grant access to the client
+ * for a specific set of scopes.
+ *
+ */
 @Entity
 @Table(name = "consents")
 @Getter
@@ -39,6 +46,10 @@ public class AuthorizationConsent {
     @Column(nullable = false)
     private boolean active = true;
 
+    /**
+     * Sets the current time as the grantedAt value if it is null.
+     * This method is called before the entity is persisted.
+     */
     @PrePersist
     public void prePersist() {
         if (grantedAt == null) {

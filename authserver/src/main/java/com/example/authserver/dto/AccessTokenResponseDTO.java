@@ -2,6 +2,11 @@ package com.example.authserver.dto;
 
 import lombok.*;
 
+
+/**
+ * This class represents the response DTO for access token.
+ *
+ */
 @Getter
 @Setter
 @NoArgsConstructor

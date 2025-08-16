@@ -6,6 +6,12 @@ import java.util.Objects;
 
 import lombok.*;
 
+
+/**
+ * AccessToken entity.
+ * The AccessToken entity is used to store access tokens and their associated data.
+ *
+ */
 @Entity
 @Table(name = "access_token")
 @Getter
@@ -42,6 +48,11 @@ public class AccessToken {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
 
+
+    /**
+     * Initializes the expiration times of the access token and refresh token
+     * before persisting token to database.
+     */
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) {

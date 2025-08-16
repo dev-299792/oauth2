@@ -14,6 +14,24 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * Filter that intercepts OAuth2 token requests using PKCE (Proof Key for Code Exchange).
+ *
+ * <p>
+ * This filter triggers only for {@code /api/oauth2/token} requests that contain
+ * a {@code code_verifier} parameter. It builds a {@link PkceAutheticationToken}
+ * (unauthenticated) and delegates authentication to the {@link AuthenticationManager}.
+ * </p>
+ *
+ * <p>
+ * On successful PKCE verification, the filter sets the authenticated token in the
+ * {@link SecurityContextHolder} and continues the filter chain. On failure,
+ * it responds with {@code 401 Unauthorized}.
+ * </p>
+ *
+ * @see PkceAutheticationToken
+ * @see com.example.authserver.security.authentication.PkceAuthenticationProvider
+ */
 @Component
 @AllArgsConstructor
 public class PkceAccessTokenRequestAuthenticationFilter extends OncePerRequestFilter {

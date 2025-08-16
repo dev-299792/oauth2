@@ -8,8 +8,13 @@ import org.springframework.security.authentication.ProviderManager;
 
 import java.util.List;
 
+
+/**
+ * Registers a custom {@link AuthenticationManager}
+ * that delegates authentication to {@link PkceAuthenticationProvider}.
+ */
 @Configuration
-public class Config {
+public class PkceSecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(PkceAuthenticationProvider pkceAuthenticationProvider) {

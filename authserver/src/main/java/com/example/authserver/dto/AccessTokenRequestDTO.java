@@ -2,6 +2,9 @@ package com.example.authserver.dto;
 
 import lombok.Data;
 
+/**
+ * A DTO for the access token request.
+ */
 @Data
 public class AccessTokenRequestDTO {
     private String code;

@@ -16,6 +16,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ * ClientController is the controller for handling client registration and client list views.
+ *
+ * @see ClientRegistrationService
+ */
 @Controller
 @AllArgsConstructor
 public class ClientController {
@@ -29,6 +35,15 @@ public class ClientController {
         return "add-client";
     }
 
+
+    /**
+     * Handles the submission of the client registration form.
+     *
+     * @param client          The client registration request params.
+     * @param bindingResult   The binding result of the form submission.
+     * @param model           The model map for the view.
+     * @return                The name of the view.
+     */
     @PostMapping("/add-client")
     String registerClient(@Valid @ModelAttribute("client") ClientRegRequestDTO client,
                           BindingResult bindingResult,
@@ -44,6 +59,12 @@ public class ClientController {
 
     }
 
+    /**
+     * Handles the GET request to list all clients of the current user.
+     *
+     * @param model The model map for the view.
+     * @return The name of the view.
+     */
     @GetMapping("/clients")
     String listClient(Model model) {
 

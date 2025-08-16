@@ -26,6 +26,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Implementation of the AccessTokenService.
+ * This class is responsible for generating access tokens based on different grant types.
+ */
 @Service
 @AllArgsConstructor
 public class AccessTokenServiceImpl implements AccessTokenService {
@@ -33,6 +37,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     private final AccessTokenRepository accessTokenRepository;
     private final AuthorizationCodeRepository authorizationCodeRepository;
     private final JwtService jwtService;
+
 
     @Transactional
     public AccessTokenResponseDTO generateAccessToken(AccessTokenRequestDTO requestDTO) {

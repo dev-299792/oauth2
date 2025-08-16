@@ -11,6 +11,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.Collection;
 
+/**
+ * Represents a client in the system.
+ * The client is the entity that requests access to the user's resources.
+ * It is also known as the client application.
+ *
+ */
 @Entity
 @Table(name = "client")
 @Getter

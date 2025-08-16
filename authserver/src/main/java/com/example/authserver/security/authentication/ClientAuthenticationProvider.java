@@ -11,7 +11,12 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-
+/**
+ * Custom {@link AuthenticationProvider} for authenticating OAuth2 clients.
+ *
+ * @see ClientRepository
+ * @see Client
+ */
 @Component
 @AllArgsConstructor
 public class ClientAuthenticationProvider implements AuthenticationProvider {
@@ -19,6 +24,13 @@ public class ClientAuthenticationProvider implements AuthenticationProvider {
     private final ClientRepository clientRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Authenticates a client using its client ID and secret.
+     *
+     * @param authentication the authentication request containing client ID and secret
+     * @return a successful {@link UsernamePasswordAuthenticationToken} if credentials are valid
+     * @throws AuthenticationException if authentication fails
+     */
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String clientId = (String) authentication.getPrincipal();
@@ -34,6 +46,12 @@ public class ClientAuthenticationProvider implements AuthenticationProvider {
         throw new BadCredentialsException("Invalid client credentials");
     }
 
+    /**
+     * Checks if this provider supports the given authentication type.
+     *
+     * @param authentication the authentication class
+     * @return true if the type is {@link UsernamePasswordAuthenticationToken}
+     */
     @Override
     public boolean supports(Class<?> authentication) {
         return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);

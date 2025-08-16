@@ -15,6 +15,19 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * Configures Spring Security for the Authorization Server.
+ *
+ * <p>Defines two independent filter chains:</p>
+ * <ul>
+ *   <li><b>Client API security (Order 1)</b>: Secures <code>/api/**</code> endpoints using
+ *       {@link ClientAuthenticationProvider} and {@link PkceAuthenticationProvider}, plus
+ *       {@link PkceAccessTokenRequestAuthenticationFilter} for PKCE validation.</li>
+ *   <li><b>User web security (Order 2)</b>: Secures UI endpoints with
+ *       {@link DaoAuthenticationProvider}, form login, and permits access to <code>/login</code>
+ *       and <code>/register</code>.</li>
+ * </ul>
+ */
 @Configuration
 @EnableWebSecurity
 @AllArgsConstructor
@@ -25,6 +38,7 @@ public class SecurityFilterConfig {
     private final DaoAuthenticationProvider daoAuthenticationProvider;
     private final PkceAccessTokenRequestAuthenticationFilter pkceAuthenticationFilter;
 
+    /** Security for client API endpoints (/api/**). */
     @Bean
     @Order(1)
     public SecurityFilterChain clientSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -43,6 +57,7 @@ public class SecurityFilterConfig {
         return http.build();
     }
 
+    /** Security for user-facing endpoints (web pages, login, register). */
     @Bean
     @Order(2)
     public SecurityFilterChain userSecurityFilterChain(HttpSecurity http) throws Exception {
