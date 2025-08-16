@@ -17,6 +17,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+/**
+ * Service implementation for client registration and management.
+ *
+ * This service allows users to register new clients, retrieve existing clients,
+ * and fetch all clients created by the currently authenticated user.
+ * It also provides utility methods to convert client registration responses
+ * into a map representation.
+ */
 @Service
 @AllArgsConstructor
 public class ClientRegistrationServiceImpl implements ClientRegistrationService {
@@ -24,10 +32,21 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
     private final ClientRepository clientRepository;
     private final PasswordEncoder encoder;
 
+    /**
+     * Retrieves a client by its clientId.
+     *
+     * @param clientId the unique identifier of the client
+     * @return an Optional containing the client if found, or empty if not found
+     */
     public Optional<Client> getClient(String clientId) {
         return clientRepository.findClientByClientId(clientId);
     }
 
+    /**
+     * Retrieves all clients created by the currently authenticated user.
+     *
+     * @return a list of ClientRegResponseDTO representing the user's clients
+     */
     public List<ClientRegResponseDTO> getAllClientsOfCurrentUser() {
         User user = getAuthenticatedUser();
         return clientRepository
@@ -37,6 +56,14 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
                 .toList();
     }
 
+    /**
+     * Registers a new client with the provided registration request.
+     *
+     * @param clientRegRequest the client registration request containing
+     *                         client name, redirect URI, and application type
+     * @return a ClientRegResponseDTO containing details of the registered client,
+     *         including the encoded client secret
+     */
     public ClientRegResponseDTO registerClient(ClientRegRequestDTO clientRegRequest) {
 
         String clientId = UUID.randomUUID().toString();
@@ -71,6 +98,12 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
         return dto;
     }
 
+    /**
+     * Converts a ClientRegResponseDTO into a map representation.
+     *
+     * @param dto the client registration response DTO
+     * @return a map where the keys are descriptive labels and the values are the corresponding client details
+     */
     public Map<String, String> convertClientRegResponseToMap(ClientRegResponseDTO dto) {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("Client Id", dto.getClientId());
@@ -82,11 +115,22 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
         return map;
     }
 
+    /**
+     * Retrieves the currently authenticated user from the security context.
+     *
+     * @return the authenticated User
+     */
     private User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return  (User) auth.getPrincipal();
     }
 
+    /**
+     * Converts a Client entity to a ClientRegResponseDTO.
+     *
+     * @param client the client entity
+     * @return a ClientRegResponseDTO representing the client
+     */
     private ClientRegResponseDTO getClientRegResponseDTO(Client client) {
         return ClientRegResponseDTO.builder()
                 .clientId(client.getClientId())

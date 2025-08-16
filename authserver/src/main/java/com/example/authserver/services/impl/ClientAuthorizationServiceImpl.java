@@ -16,6 +16,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+/**
+ * Implementation of the ClientAuthorizationService.
+ * This class handles generation of authorization codes for clients and validates client requests
+ * according to OAuth2 authorization code flow.
+ */
 @Service
 @AllArgsConstructor
 public class ClientAuthorizationServiceImpl implements ClientAuthorizationService {
@@ -23,11 +28,19 @@ public class ClientAuthorizationServiceImpl implements ClientAuthorizationServic
     private final ClientRepository clientRepository;
     private final AuthorizationCodeRepository codeRepository;
 
+    /**
+     * Generates a new authorization code for a client based on the provided redirect parameters.
+     *
+     * @param params the redirect parameters containing client ID, redirect URI, scope, and PKCE details
+     * @return the generated authorization code
+     * @throws InvalidRequestException if client validation fails
+     * @throws RedirectBackWithErrorException if response_type or scope is invalid
+     */
     public String getAuthorizationCode(ClientAuthorizationRedirectParams params) {
 
         Client client = clientRepository.findClientByClientId(params.getClient_id()).orElse(null);
 
-        validateClientDetails(client,params);
+        validateClientDetails(client, params);
 
         AuthorizationCode code = AuthorizationCode
                 .builder()
@@ -38,7 +51,7 @@ public class ClientAuthorizationServiceImpl implements ClientAuthorizationServic
                 .client(client)
                 .build();
 
-        if(params.getCode_challenge()!=null && !params.getCode_challenge().isBlank()) {
+        if (params.getCode_challenge() != null && !params.getCode_challenge().isBlank()) {
             code.setCodeChallenge(params.getCode_challenge());
             code.setCodeChallengeMethod(params.getCode_challenge_method());
         }
@@ -48,14 +61,28 @@ public class ClientAuthorizationServiceImpl implements ClientAuthorizationServic
         return code.getCode();
     }
 
+    /**
+     * Retrieves the currently authenticated user from the security context.
+     *
+     * @return the authenticated User entity
+     */
     private User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return (User) auth.getPrincipal();
     }
 
+    /**
+     * Validates the details of a client against the provided redirect parameters.
+     * Checks for client existence, valid redirect URI, response type, and requested scopes.
+     *
+     * @param client the Client entity retrieved from the repository
+     * @param params the redirect parameters containing client request details
+     * @throws InvalidRequestException if client does not exist or redirect URI is invalid
+     * @throws RedirectBackWithErrorException if response_type or scope is invalid
+     */
     private void validateClientDetails(Client client, ClientAuthorizationRedirectParams params) {
 
-        if (client==null){
+        if (client == null) {
             throw new InvalidRequestException("Unknown Client.");
         }
 
@@ -63,20 +90,26 @@ public class ClientAuthorizationServiceImpl implements ClientAuthorizationServic
             throw new InvalidRequestException("Invalid Redirect Uri.");
         }
 
-        if(!params.getResponse_type().equals("code")) {
+        if (!params.getResponse_type().equals("code")) {
             throw new RedirectBackWithErrorException("Invalid response_type.");
         }
 
-        for(String scope : params.getScope().split(" ")) {
-            if(scope.isBlank()) continue;
-            if(!client.getScopesSet().contains(scope)) {
+        for (String scope : params.getScope().split(" ")) {
+            if (scope.isBlank()) continue;
+            if (!client.getScopesSet().contains(scope)) {
                 throw new RedirectBackWithErrorException("Invalid scope.");
             }
         }
     }
 
+    /**
+     * Validates client details for a given client ID and redirect parameters.
+     *
+     * @param clientId the ID of the client
+     * @param params the redirect parameters containing client request details
+     */
     public void validateClientDetails(String clientId, ClientAuthorizationRedirectParams params) {
         Client client = clientRepository.findClientByClientId(clientId).orElse(null);
-        validateClientDetails(client,params);
+        validateClientDetails(client, params);
     }
 }

@@ -19,6 +19,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Set;
 
+/**
+ * Controller for handling the consent screen.
+ *
+ * @see AuthorizationConsentService
+ * @see ClientAuthorizationService
+ * @see ClientRegistrationService
+ */
 @Controller
 @AllArgsConstructor
 public class ConsentController {

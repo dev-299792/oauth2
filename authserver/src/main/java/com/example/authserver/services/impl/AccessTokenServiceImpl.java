@@ -27,8 +27,10 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Implementation of the AccessTokenService.
- * This class is responsible for generating access tokens based on different grant types.
+ * Implementation of the {@link AccessTokenService}.
+ * <p>
+ * This service handles the generation, validation, and persistence of access tokens
+ * for different OAuth2 grant types such as Authorization Code and Refresh Token.
  */
 @Service
 @AllArgsConstructor
@@ -38,7 +40,13 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     private final AuthorizationCodeRepository authorizationCodeRepository;
     private final JwtService jwtService;
 
-
+    /**
+     * Generates an access token based on the grant type specified in the request.
+     *
+     * @param requestDTO The access token request containing grant type, code, scopes, etc.
+     * @return An {@link AccessTokenResponseDTO} containing the generated access token details.
+     * @throws InvalidRequestException if the grant type is not supported.
+     */
     @Transactional
     public AccessTokenResponseDTO generateAccessToken(AccessTokenRequestDTO requestDTO) {
 
@@ -58,6 +66,14 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         return toResponseDTO(token);
     }
 
+    /**
+     * Creates a new {@link AccessToken} for a user and client with given scopes.
+     *
+     * @param userId The user ID.
+     * @param client The client requesting the token.
+     * @param scopes The requested scopes.
+     * @return A persisted {@link AccessToken}.
+     */
     private AccessToken createAccessToken(String userId, Client client, String scopes) {
 
         // 5 minutes from now
@@ -80,6 +96,13 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         return accessTokenRepository.save(token);
     }
 
+    /**
+     * Generates an access token using the Authorization Code grant type.
+     *
+     * @param requestDTO The request containing the authorization code and other parameters.
+     * @return A newly created {@link AccessToken}.
+     * @throws InvalidRequestException if the authorization code is invalid or expired.
+     */
     private AccessToken generateForAuthorizationCode(AccessTokenRequestDTO requestDTO) {
         AuthorizationCode authorizationCode =
                 authorizationCodeRepository
@@ -102,6 +125,13 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         }
     }
 
+    /**
+     * Generates an access token using the Refresh Token grant type.
+     *
+     * @param requestDTO The request containing the refresh token and scopes.
+     * @return A newly created {@link AccessToken}.
+     * @throws RestInvalidRequestException if the refresh token is invalid or expired.
+     */
     private AccessToken generateForRefreshToken(AccessTokenRequestDTO requestDTO) {
         AccessToken oldToken = accessTokenRepository.findByRefreshToken(requestDTO.getRefresh_token())
                 .orElseThrow(() -> new RestInvalidRequestException("invalid_refresh_token"));
@@ -116,6 +146,13 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         }
     }
 
+    /**
+     * Validates a refresh token request.
+     *
+     * @param oldToken   The old access token associated with the refresh token.
+     * @param requestDTO The incoming request.
+     * @throws RestInvalidRequestException if validation fails.
+     */
     private void validateRefreshTokenRequest(AccessToken oldToken, AccessTokenRequestDTO requestDTO) {
 
         String clientId = getClientIdOfAuthenticatedClientId();
@@ -142,6 +179,14 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         }
     }
 
+    /**
+     * Validates an authorization code access token request.
+     *
+     * @param requestDTO       The access token request.
+     * @param authorizationCode The authorization code entity.
+     * @param client           The associated client.
+     * @throws RestInvalidRequestException if validation fails.
+     */
     private void validateAccessTokenRequest(AccessTokenRequestDTO requestDTO, AuthorizationCode authorizationCode, Client client) {
         String clientId = getClientIdOfAuthenticatedClientId();
         if(client==null || !client.getClientId().equals(clientId)) {
@@ -180,6 +225,12 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         }
     }
 
+    /**
+     * Converts an {@link AccessToken} entity into a response DTO.
+     *
+     * @param token The access token entity.
+     * @return A populated {@link AccessTokenResponseDTO}.
+     */
     private AccessTokenResponseDTO toResponseDTO(AccessToken token) {
         Duration accessTokenExp = Duration.between(token.getCreatedAt(), token.getExpiresAt());
         Duration refreshTokenExp = Duration.between(token.getCreatedAt(), token.getRefreshTokenExpiresAt());
@@ -194,11 +245,21 @@ public class AccessTokenServiceImpl implements AccessTokenService {
                 .build();
     }
 
+    /**
+     * Retrieves the authenticated client ID from the security context.
+     *
+     * @return The client ID of the authenticated client.
+     */
     private String getClientIdOfAuthenticatedClientId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return  (String) auth.getPrincipal();
     }
 
+    /**
+     * Checks if PKCE (Proof Key for Code Exchange) was verified during authentication.
+     *
+     * @return true if PKCE was verified, false otherwise.
+     */
     private boolean isPkceVerified() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return auth instanceof PkceAutheticationToken;

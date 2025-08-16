@@ -11,16 +11,37 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+/**
+ * Service implementation for registering new users.
+ *
+ * <p>This service handles creating new {@link User} entities, encoding passwords,
+ * and persisting users to the database. It also validates that usernames are unique
+ * before registration.</p>
+ */
 @Service
 @AllArgsConstructor
 public class RegistrationServiceImpl implements RegistrationService {
 
-    public final UserRepository userRepository;
-    public final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Registers a new user with the provided {@link UserDTO}.
+     *
+     * <p>This method performs the following steps:</p>
+     * <ol>
+     *     <li>Checks if a user with the given username already exists and throws {@link UserAlreadyExistsException} if true.</li>
+     *     <li>Creates a new {@link User} entity with a randomly generated UUID.</li>
+     *     <li>Encodes the user's password using the configured {@link PasswordEncoder}.</li>
+     *     <li>Marks the user as enabled and saves the entity to the {@link UserRepository}.</li>
+     * </ol>
+     *
+     * @param userDTO the user registration data transfer object containing username and password
+     * @throws UserAlreadyExistsException if a user with the given username already exists
+     */
     public void registerUser(UserDTO userDTO) {
 
-        if(userRepository.existsByUsername(userDTO.getUsername())) {
+        if (userRepository.existsByUsername(userDTO.getUsername())) {
             throw new UserAlreadyExistsException();
         }
 
