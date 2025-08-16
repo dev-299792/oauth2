@@ -1,4 +1,4 @@
-package com.example.authserver.services;
+package com.example.authserver.services.impl;
 
 import com.example.authserver.repository.UserRepository;
 import lombok.AllArgsConstructor;

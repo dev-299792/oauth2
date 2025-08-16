@@ -3,6 +3,7 @@ package com.example.authserver.controller;
 import com.example.authserver.dto.UserDTO;
 import com.example.authserver.exception.UserAlreadyExistsException;
 import com.example.authserver.services.RegistrationService;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,13 +11,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
+@AllArgsConstructor
 public class LoginRegistrationController {
 
     private final RegistrationService registrationService;
-
-    public LoginRegistrationController(RegistrationService registrationService) {
-        this.registrationService = registrationService;
-    }
 
     @GetMapping("/login")
     String login() {
