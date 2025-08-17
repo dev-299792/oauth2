@@ -107,7 +107,9 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
     public Map<String, String> convertClientRegResponseToMap(ClientRegResponseDTO dto) {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("Client Id", dto.getClientId());
-        map.put("Client Secret", dto.getClientSecret());
+        if(dto.getClientSecret() !=null && !dto.getClientSecret().isBlank()) {
+            map.put("Client Secret", dto.getClientSecret());
+        }
         map.put("Client Name", dto.getClientName());
         map.put("Redirect Uri", dto.getRedirectUri());
         map.put("Client Authentication Methods", dto.getClientAuthenticationMethods());
