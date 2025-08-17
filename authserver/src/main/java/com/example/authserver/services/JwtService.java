@@ -16,9 +16,10 @@ public interface JwtService {
      * @param subject   the subject (typically user ID)
      * @param expiresAt the token expiration date
      * @param claims    additional claims to include
+     * @param audience   the audience (typically client ID)
      * @return the generated JWT as a string
      */
-    String generateToken(String subject, Date expiresAt, Map<String, String> claims);
+    String generateToken(String subject, Date expiresAt, Map<String, String> claims, String audience);
 
     /**
      * Verifies a JWT token and returns its decoded form.

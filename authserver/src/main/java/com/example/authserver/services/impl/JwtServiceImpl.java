@@ -45,16 +45,22 @@ public class JwtServiceImpl implements JwtService {
      * @param subject  the subject (usually the user ID or username) of the token
      * @param expiresAt the expiration date of the token
      * @param claims   a map of custom claims to include in the JWT
+     * @param audience   the audience (typically client ID)
      * @return a signed JWT token as a string
      */
-    public String generateToken(String subject, Date expiresAt, Map<String, String> claims) {
+    public String generateToken(String subject, Date expiresAt, Map<String, String> claims, String audience) {
         var jwtBuilder = JWT.create()
                 .withSubject(subject)
                 .withIssuedAt(new Date())
                 .withIssuer("https://secureLoginOauthProvider.com") // ToDo: change issuer
                 .withExpiresAt(expiresAt);
 
-        claims.forEach(jwtBuilder::withClaim);
+        if(claims!=null) {
+            claims.forEach(jwtBuilder::withClaim);
+        }
+        if(audience!=null && !audience.isBlank()) {
+            jwtBuilder.withAudience(audience);
+        }
         return jwtBuilder.sign(rsa256);
     }
 

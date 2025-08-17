@@ -57,13 +57,13 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         }
 
         try {
-            AccessToken token = switch (grantType) {
+            AccessTokenResponseDTO token = switch (grantType) {
                 case AUTHORIZATION_CODE -> generateForAuthorizationCode(requestDTO);
                 case REFRESH_TOKEN -> generateForRefreshToken(requestDTO);
                 //case CLIENT_CREDENTIALS ->  ToDo: implement client credentials
                 default -> throw new RestInvalidRequestException("unsupported_grant_type");
             };
-            return toResponseDTO(token);
+            return token;
         } catch (Exception e) {
             // Todo: create and replace with rest internal server exception.
             throw new RestInvalidRequestException("something went wrong.");
@@ -88,7 +88,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
                 "client_id",client.getClientId(),
                 "scopes",scopes
         );
-        String jwtToken = jwtService.generateToken(userId, expiresAt, claims);
+        String jwtToken = jwtService.generateToken(userId, expiresAt, claims,null);
 
         AccessToken token = AccessToken
                 .builder()
@@ -102,13 +102,30 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     }
 
     /**
+     * Generates an ID token for the given client and authorization code.
+     *
+     * @param client The client requesting the ID token.
+     * @param authorizationCode The authorization code associated with the user.
+     * @return The ID token as a string.
+     */
+    private String generateIdToken(Client client, AuthorizationCode authorizationCode) {
+
+        Date expiresAt = new Date( new Date().getTime() + 5 * 60 * 1000 );
+
+        return jwtService.generateToken(authorizationCode.getUser_id(),
+                                                    expiresAt,
+                                              null,
+                                                    client.getClientId());
+    }
+
+    /**
      * Generates an access token using the Authorization Code grant type.
      *
      * @param requestDTO The request containing the authorization code and other parameters.
-     * @return A newly created {@link AccessToken}.
+     * @return A newly created {@link AccessTokenResponseDTO}.
      * @throws RestInvalidRequestException if the authorization code is invalid or expired.
      */
-    private AccessToken generateForAuthorizationCode(AccessTokenRequestDTO requestDTO) {
+    private AccessTokenResponseDTO generateForAuthorizationCode(AccessTokenRequestDTO requestDTO) {
         AuthorizationCode authorizationCode =
                 authorizationCodeRepository
                         .findById(requestDTO.getCode())
@@ -121,7 +138,12 @@ public class AccessTokenServiceImpl implements AccessTokenService {
                 client = authorizationCode.getClient();
             }
             validateAccessTokenRequest(requestDTO, authorizationCode, client);
-            return createAccessToken(authorizationCode.getUser_id(), client, authorizationCode.getScopes());
+            AccessToken accessToken = createAccessToken(authorizationCode.getUser_id(),
+                                                        client, authorizationCode.getScopes());
+            AccessTokenResponseDTO tokenResponseDTO = toResponseDTO(accessToken);
+            String idToken = generateIdToken(client,authorizationCode);
+            tokenResponseDTO.setId_token(idToken);
+            return tokenResponseDTO;
         }
         finally {
             if(authorizationCode!=null) {
@@ -134,17 +156,17 @@ public class AccessTokenServiceImpl implements AccessTokenService {
      * Generates an access token using the Refresh Token grant type.
      *
      * @param requestDTO The request containing the refresh token and scopes.
-     * @return A newly created {@link AccessToken}.
+     * @return A newly created {@link AccessTokenResponseDTO}.
      * @throws RestInvalidRequestException if the refresh token is invalid or expired.
      */
-    private AccessToken generateForRefreshToken(AccessTokenRequestDTO requestDTO) {
+    private AccessTokenResponseDTO generateForRefreshToken(AccessTokenRequestDTO requestDTO) {
         AccessToken oldToken = accessTokenRepository.findByRefreshToken(requestDTO.getRefresh_token())
                 .orElseThrow(() -> new RestInvalidRequestException("invalid_refresh_token"));
 
         try {
             validateRefreshTokenRequest(oldToken,requestDTO);
-            return createAccessToken(oldToken.getUser_id(), oldToken.getClient(), requestDTO.getScopes());
-
+            AccessToken token = createAccessToken(oldToken.getUser_id(), oldToken.getClient(), requestDTO.getScopes());
+            return toResponseDTO(token);
         } finally {
             oldToken.setRefreshTokenExpiresAt(LocalDateTime.now().minusHours(1));
             accessTokenRepository.save(oldToken);

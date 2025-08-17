@@ -7,6 +7,7 @@ import com.example.authserver.entity.User;
 import com.example.authserver.enums.ApplicationType;
 import com.example.authserver.enums.ClientAuthenticationType;
 import com.example.authserver.enums.GrantType;
+import com.example.authserver.enums.OpenidScopes;
 import com.example.authserver.repository.ClientRepository;
 import com.example.authserver.services.ClientRegistrationService;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Service implementation for client registration and management.
@@ -78,13 +80,19 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
             clientAuth.add(ClientAuthenticationType.CLIENT_SECRET_BASIC.getCode());
         }
 
+        // add all openid scopes as supported scopes to client.
+        String scopes = Arrays.stream(OpenidScopes.values())
+                .map(String::valueOf)
+                .map(String::toLowerCase)
+                .collect(Collectors.joining(" "));
+
         Client client = Client
                 .builder()
                 .clientId(clientId)
                 .clientName(clientRegRequest.getClientName())
                 .clientSecret(encoder.encode(secret))
                 .redirectUris(clientRegRequest.getRedirectUri())
-                .scopes("read profile") // adding default scopes for now..
+                .scopes(scopes)
                 .createdBy(getAuthenticatedUser().getUser_id())
                 .build();
 
@@ -94,7 +102,7 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
         client = clientRepository.save(client);
 
         ClientRegResponseDTO dto = getClientRegResponseDTO(client);
-        dto.setClientSecret(client.getClientSecret());
+        dto.setClientSecret(secret);
         return dto;
     }
 
