@@ -6,7 +6,6 @@ import com.example.authserver.entity.AccessToken;
 import com.example.authserver.entity.AuthorizationCode;
 import com.example.authserver.entity.Client;
 import com.example.authserver.enums.GrantType;
-import com.example.authserver.exception.InvalidRequestException;
 import com.example.authserver.exception.RestInvalidRequestException;
 import com.example.authserver.repository.AccessTokenRepository;
 import com.example.authserver.repository.AuthorizationCodeRepository;
@@ -43,9 +42,9 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     /**
      * Generates an access token based on the grant type specified in the request.
      *
-     * @param requestDTO The access token request containing grant type, code, scopes, etc.
+     * @param requestDTO The access token request containing grant type, code, etc.
      * @return An {@link AccessTokenResponseDTO} containing the generated access token details.
-     * @throws InvalidRequestException if the grant type is not supported.
+     * @throws RestInvalidRequestException if the grant type is not supported.
      */
     @Transactional
     public AccessTokenResponseDTO generateAccessToken(AccessTokenRequestDTO requestDTO) {
@@ -54,16 +53,22 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         try {
             grantType = GrantType.valueOf(requestDTO.getGrant_type().toUpperCase());
         } catch (IllegalArgumentException | NullPointerException e) {
-            throw new InvalidRequestException("unsupported_grant_type");
+            throw new RestInvalidRequestException("unsupported_grant_type");
         }
 
-        AccessToken token = switch (grantType) {
-            case AUTHORIZATION_CODE -> generateForAuthorizationCode(requestDTO);
-            case REFRESH_TOKEN -> generateForRefreshToken(requestDTO);
-            //case CLIENT_CREDENTIALS ->  ToDo: implement client credentials
-            default -> throw new InvalidRequestException("unsupported_grant_type");
-        };
-        return toResponseDTO(token);
+        try {
+            AccessToken token = switch (grantType) {
+                case AUTHORIZATION_CODE -> generateForAuthorizationCode(requestDTO);
+                case REFRESH_TOKEN -> generateForRefreshToken(requestDTO);
+                //case CLIENT_CREDENTIALS ->  ToDo: implement client credentials
+                default -> throw new RestInvalidRequestException("unsupported_grant_type");
+            };
+            return toResponseDTO(token);
+        } catch (Exception e) {
+            // Todo: create and replace with rest internal server exception.
+            throw new RestInvalidRequestException("something went wrong.");
+        }
+
     }
 
     /**
@@ -101,14 +106,14 @@ public class AccessTokenServiceImpl implements AccessTokenService {
      *
      * @param requestDTO The request containing the authorization code and other parameters.
      * @return A newly created {@link AccessToken}.
-     * @throws InvalidRequestException if the authorization code is invalid or expired.
+     * @throws RestInvalidRequestException if the authorization code is invalid or expired.
      */
     private AccessToken generateForAuthorizationCode(AccessTokenRequestDTO requestDTO) {
         AuthorizationCode authorizationCode =
                 authorizationCodeRepository
                         .findById(requestDTO.getCode())
                         .orElseThrow(() ->
-                                new InvalidRequestException("invalid_request"));
+                                new RestInvalidRequestException("invalid_request"));
 
         try {
             Client client = null;
@@ -116,7 +121,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
                 client = authorizationCode.getClient();
             }
             validateAccessTokenRequest(requestDTO, authorizationCode, client);
-            return createAccessToken(authorizationCode.getUser_id(), client, requestDTO.getScopes());
+            return createAccessToken(authorizationCode.getUser_id(), client, authorizationCode.getScopes());
         }
         finally {
             if(authorizationCode!=null) {
@@ -209,20 +214,6 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         ) {
             throw new RestInvalidRequestException("invalid_redirect_uri");
         }
-
-        if(requestDTO.getScopes()==null || requestDTO.getScopes().isBlank()) {
-            throw new InvalidRequestException("scope_absent");
-        }
-
-        String[] requestedScopes = requestDTO.getScopes().split(" ");
-        Set<String> authCodeScopes = authorizationCode.getScopesSet();
-        Set<String> clientScopes = client.getScopesSet();
-        for(String scope : requestedScopes) {
-            if(scope.isBlank()) continue;
-            if(!authCodeScopes.contains(scope) || !clientScopes.contains(scope)) {
-                throw new InvalidRequestException("invalid_scope");
-            }
-        }
     }
 
     /**
@@ -241,7 +232,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
                 .scope(token.getScopes())
                 .expires_in(accessTokenExp.getSeconds())
                 .refresh_token_expires_in(refreshTokenExp.getSeconds())
-                .tokenType("Bearer") // ToDo: remove hardcode
+                .token_type("Bearer") // ToDo: remove hardcode
                 .build();
     }
 

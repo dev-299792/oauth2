@@ -18,5 +18,5 @@ public class AccessTokenResponseDTO {
     private String refresh_token;
     private Long refresh_token_expires_in;
     private String scope;
-    private String tokenType;
+    private String token_type;
 }
