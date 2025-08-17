@@ -2,8 +2,8 @@ package com.example.authserver.security.authentication;
 
 import com.example.authserver.entity.AuthorizationCode;
 import com.example.authserver.repository.AuthorizationCodeRepository;
+import com.example.authserver.util.HashUtil;
 import lombok.AllArgsConstructor;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -47,7 +47,8 @@ public class PkceAuthenticationProvider implements AuthenticationProvider {
             String generatedChallenge = null;
             String method = code.getCodeChallengeMethod();
             if ("SHA256".equalsIgnoreCase(method)) {
-                generatedChallenge = DigestUtils.sha256Hex(token.getCodeVerifier());
+                generatedChallenge = HashUtil.generateSha256Base64Encoded(token.getCodeVerifier());
+
             } else if ("plain".equalsIgnoreCase(method)) {
                 generatedChallenge = token.getCodeVerifier();
             }
