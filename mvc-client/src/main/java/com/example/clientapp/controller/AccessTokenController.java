@@ -40,11 +40,8 @@ public class AccessTokenController {
 
         AccessTokenRequestDTO dto = AccessTokenRequestDTO
                 .builder()
-                .client_id(oAuth2Properties.getClient().getClientId())
-                .client_secret(oAuth2Properties.getClient().getClientSecret())
                 .code(code)
                 .grant_type("authorization_code")
-                .scopes("profile")
                 .redirect_uri(oAuth2Properties.getClient().getRedirectUri())
                 .build();
 

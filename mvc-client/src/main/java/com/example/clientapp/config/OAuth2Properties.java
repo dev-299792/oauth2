@@ -22,7 +22,7 @@ public class OAuth2Properties {
         private String clientId;
         private String clientSecret;
         private String redirectUri;
-        private List<String> scopes;
+        private String scopes;
     }
 
     @Setter

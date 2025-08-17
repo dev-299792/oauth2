@@ -33,7 +33,7 @@ public class LoginController {
         String authServerUrl = properties.getServer().getAuthorizationUri();
         String clientId = properties.getClient().getClientId();
         String redirectUri = properties.getClient().getRedirectUri();
-        String scope = "profile";
+        String scope = properties.getClient().getScopes();
 
         String state = SecurityUtil.generateRandomState();
         Cookie cookie = new Cookie("state",state);

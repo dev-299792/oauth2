@@ -8,5 +8,6 @@ public class AccessTokenResponseDTO {
     private Long expires_in; //seconds
     private String refresh_token;
     private String scope;
-    private String tokenType;
+    private String token_type;
+    private String id_token;
 }
