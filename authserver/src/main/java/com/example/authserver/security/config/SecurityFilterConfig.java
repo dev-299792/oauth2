@@ -3,6 +3,7 @@ package com.example.authserver.security.config;
 import com.example.authserver.security.authentication.ClientAuthenticationProvider;
 import com.example.authserver.security.authentication.PkceAuthenticationProvider;
 import com.example.authserver.security.filter.PkceAccessTokenRequestAuthenticationFilter;
+import com.example.authserver.security.handler.UserAuthFailureHandler;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +38,7 @@ public class SecurityFilterConfig {
     private final PkceAuthenticationProvider pkceAuthenticationProvider;
     private final DaoAuthenticationProvider daoAuthenticationProvider;
     private final PkceAccessTokenRequestAuthenticationFilter pkceAuthenticationFilter;
+    private final UserAuthFailureHandler userAuthFailureHandler;
 
     /** Security for client API endpoints (/api/**). */
     @Bean
@@ -64,11 +66,12 @@ public class SecurityFilterConfig {
         http
                 .authenticationProvider(daoAuthenticationProvider)
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/login","/register").permitAll()
+                        .requestMatchers("/login","/register","/verify-email","/verify").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
+                        .failureHandler(userAuthFailureHandler)
                         .permitAll()
                 );
 

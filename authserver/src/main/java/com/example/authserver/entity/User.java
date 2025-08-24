@@ -36,7 +36,7 @@ public class User implements UserDetails {
     private String email;
 
     @Column(nullable = false)
-    private boolean enabled = true;
+    private boolean enabled = false;
 
     // UserDetails interface methods
 

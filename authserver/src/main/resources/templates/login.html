@@ -21,14 +21,23 @@
 <main class="flex-grow-1 container px-4 py-5 d-flex align-items-center justify-content-center">
     <div class="bg-white p-5 rounded-3 shadow-sm w-100 text-center" style="max-width: 400px;">
         <h1 class="h3 fw-bold text-dark mb-4">Please Log In</h1>
-        <div th:if="${param.error}" class="alert alert-danger mb-4">
-            <p>Invalid username or password.</p>
+
+        <div th:if="${param.error}">
+            <div th:if="${param.error[0] == 'verify'}"
+                 class="alert alert-warning">
+                Your account is not verified. Please check your email.
+            </div>
+            <div th:if="${param.error[0] != 'verify'}"
+                 class="alert alert-danger">
+                Invalid username or password.
+            </div>
         </div>
+
         <div th:if="${param.logout}" class="alert alert-success mb-4">
             <p>You have been logged out.</p>
         </div>
-        <div th:if="${param.registerSuccess}" class="alert alert-success mb-4">
-            <p>You have registered successfully! Kindly Log in.</p>
+        <div th:if="${param.verified}" class="alert alert-success mb-4">
+            <p>Account verification successful! Kindly log in.</p>
         </div>
         <form th:action="@{/login}" method="post" class="mb-3">
             <div class="mb-3">
