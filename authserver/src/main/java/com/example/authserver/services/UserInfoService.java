@@ -1,10 +1,12 @@
 package com.example.authserver.services;
 
-import com.example.authserver.dto.UserInfoDTO;
+import com.example.authserver.dto.UserInfoResponseDTO;
+import com.example.authserver.dto.UserProfileDTO;
 
 import java.util.Map;
 
 public interface UserInfoService {
-    void saveUserData(UserInfoDTO profile);
-    Map<String,String> getUserProfile();
+    void saveUserData(UserProfileDTO profile);
+    Map<String,String> getCompleteUserProfile();
+    UserInfoResponseDTO getScopeBasedUserInfo();
 }

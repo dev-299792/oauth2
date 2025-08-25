@@ -84,11 +84,9 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         // 5 minutes from now
         Date expiresAt = new Date( new Date().getTime() + 5 * 60 * 1000 );
 
-        var claims = Map.of(
-                "client_id",client.getClientId(),
-                "scopes",scopes
-        );
-        String jwtToken = jwtService.generateToken(userId, expiresAt, claims,null);
+        var claims = Map.of("scopes",scopes);
+
+        String jwtToken = jwtService.generateToken(userId, expiresAt, claims,client.getClientId());
 
         AccessToken token = AccessToken
                 .builder()

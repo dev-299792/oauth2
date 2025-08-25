@@ -1,5 +1,6 @@
 package com.example.authserver.security.config;
 
+import com.example.authserver.security.authentication.BearerTokenAuthenticationProvider;
 import com.example.authserver.security.authentication.PkceAuthenticationProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,13 +15,15 @@ import java.util.List;
  * that delegates authentication to {@link PkceAuthenticationProvider}.
  */
 @Configuration
-public class PkceSecurityConfig {
+public class AuthenticationManagerSecurityConfig {
 
     @Bean
-    public AuthenticationManager authenticationManager(PkceAuthenticationProvider pkceAuthenticationProvider) {
+    public AuthenticationManager authenticationManager(PkceAuthenticationProvider pkceAuthenticationProvider,
+                                                       BearerTokenAuthenticationProvider bearerTokenAuthenticationProvider) {
         return new ProviderManager(
                 List.of(
-                        pkceAuthenticationProvider
+                        pkceAuthenticationProvider,
+                        bearerTokenAuthenticationProvider
                 )
         );
     }

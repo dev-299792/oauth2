@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
-public class UserInfoDTO {
+public class UserProfileDTO {
 
     private ProfileDTO profile = new ProfileDTO();
     private AddressDTO address = new AddressDTO();

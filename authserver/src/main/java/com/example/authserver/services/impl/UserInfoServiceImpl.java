@@ -1,6 +1,7 @@
 package com.example.authserver.services.impl;
 
-import com.example.authserver.dto.UserInfoDTO;
+import com.example.authserver.dto.UserInfoResponseDTO;
+import com.example.authserver.dto.UserProfileDTO;
 import com.example.authserver.entity.User;
 import com.example.authserver.entity.user.Address;
 import com.example.authserver.entity.user.Phone;
@@ -13,12 +14,12 @@ import com.example.authserver.repository.user.UserProfileRepository;
 import com.example.authserver.services.UserInfoService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -30,37 +31,37 @@ public class UserInfoServiceImpl implements UserInfoService {
     private final UserRepository userRepository;
 
     @Override
-    public void saveUserData(UserInfoDTO userInfoDTO) {
+    public void saveUserData(UserProfileDTO userProfileDTO) {
 
         User user = getAuthenticatedUser();
 
         UserProfile profile = new UserProfile();
         profile.setId(UUID.randomUUID().toString());
-        profile.setFirstName(userInfoDTO.getProfile().getFirstName());
-        profile.setLastName(userInfoDTO.getProfile().getLastName());
-        profile.setDateOfBirth(userInfoDTO.getProfile().getDateOfBirth());
+        profile.setFirstName(userProfileDTO.getProfile().getFirstName());
+        profile.setLastName(userProfileDTO.getProfile().getLastName());
+        profile.setDateOfBirth(userProfileDTO.getProfile().getDateOfBirth());
         profile.setUser(user);
         userProfileRepository.save(profile);
 
         Address address = new Address();
         address.setId(UUID.randomUUID().toString());
-        address.setStreet(userInfoDTO.getAddress().getStreet());
-        address.setCity(userInfoDTO.getAddress().getCity());
-        address.setState(userInfoDTO.getAddress().getState());
-        address.setPostalCode(userInfoDTO.getAddress().getPostalCode());
-        address.setCountry(userInfoDTO.getAddress().getCountry());
+        address.setStreet(userProfileDTO.getAddress().getStreet());
+        address.setCity(userProfileDTO.getAddress().getCity());
+        address.setState(userProfileDTO.getAddress().getState());
+        address.setPostalCode(userProfileDTO.getAddress().getPostalCode());
+        address.setCountry(userProfileDTO.getAddress().getCountry());
         address.setUser(user);
         addressRepository.save(address);
 
         Phone phone = new Phone();
         phone.setId(UUID.randomUUID().toString());
-        phone.setNumber(userInfoDTO.getPhone());
+        phone.setNumber(userProfileDTO.getPhone());
         phone.setUser(user);
         phoneRepository.save(phone);
 
     }
 
-    public Map<String,String> getUserProfile() {
+    public Map<String,String> getCompleteUserProfile() {
 
         User user = userRepository.findByUsername(getAuthenticatedUser().getUsername()).orElse(null);
 
@@ -87,6 +88,67 @@ public class UserInfoServiceImpl implements UserInfoService {
         return savedUser;
     }
 
+    @Override
+    public UserInfoResponseDTO getScopeBasedUserInfo() {
+
+        User user = getAuthenticatedUser();
+
+        var authorities = getAuthorities();
+
+        Set<String> scopes = authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(s -> s.startsWith("SCOPE_"))
+                .map(s -> s.substring("SCOPE_".length()))
+                .collect(Collectors.toSet());
+
+        if(!scopes.contains("openid")) {
+            return null;
+        }
+
+        UserInfoResponseDTO.UserInfoResponseDTOBuilder builder =
+                UserInfoResponseDTO.builder();
+
+        builder.sub(user.getUser_id());
+
+        if(scopes.contains("email")) {
+            builder.email(user.getEmail());
+            builder.emailVerified(user.isEnabled());
+        }
+
+        if(scopes.contains("phone")) {
+            Phone phone = user.getPhones().stream().findFirst().orElse(null);
+            if(phone!=null) {
+                builder.phoneNumber(phone.getNumber());
+                builder.phoneNumberVerified(false);
+            }
+        }
+
+        if(scopes.contains("profile")) {
+            UserProfile profile = user.getProfile();
+            if(profile!=null) {
+                builder.name(profile.getFirstName() + " " + profile.getLastName());
+                builder.givenName(profile.getFirstName());
+                builder.familyName(profile.getLastName());
+                builder.birthdate(profile.getDateOfBirth().toString());
+            }
+        }
+
+        if(scopes.contains("address")) {
+            Address address = user.getAddresses().stream().findFirst().orElse(null);
+            if(address!=null) {
+                Map<String,String> map = new LinkedHashMap<>();
+                map.put("street", address.getStreet());
+                map.put("city",address.getCity());
+                map.put("state", address.getState());
+                map.put("postalCode", address.getPostalCode());
+                map.put("country", address.getCountry());
+                builder.address(map);
+            }
+        }
+
+        return builder.build();
+    }
+
     /**
      * Retrieves the currently authenticated user from the security context.
      *
@@ -96,4 +158,10 @@ public class UserInfoServiceImpl implements UserInfoService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return (User) auth.getPrincipal();
     }
+
+    private Collection<? extends GrantedAuthority> getAuthorities() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth.getAuthorities();
+    }
+
 }

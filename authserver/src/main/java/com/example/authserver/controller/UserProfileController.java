@@ -1,6 +1,6 @@
 package com.example.authserver.controller;
 
-import com.example.authserver.dto.UserInfoDTO;
+import com.example.authserver.dto.UserProfileDTO;
 import com.example.authserver.exception.ProfileNotUpdatedException;
 import com.example.authserver.services.UserInfoService;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Controller
@@ -23,20 +22,20 @@ public class UserProfileController {
     public String showProfileForm(Model model) {
 
         try {
-            Map<String,String> userProfile = userInfoService.getUserProfile();
+            Map<String,String> userProfile = userInfoService.getCompleteUserProfile();
             model.addAttribute("userProfile", userProfile);
         } catch (ProfileNotUpdatedException e) {
-            model.addAttribute("userProfileForm", new UserInfoDTO());
+            model.addAttribute("userProfileForm", new UserProfileDTO());
         }
 
         return "profile";
     }
 
     @PostMapping("/profile")
-    public String saveProfile(@ModelAttribute UserInfoDTO userProfileForm, Model model) {
+    public String saveProfile(@ModelAttribute UserProfileDTO userProfileForm, Model model) {
 
         userInfoService.saveUserData(userProfileForm);
-        model.addAttribute("userProfile", userInfoService.getUserProfile());
+        model.addAttribute("userProfile", userInfoService.getCompleteUserProfile());
         model.addAttribute("savedUser",true);
         return "profile";
     }
