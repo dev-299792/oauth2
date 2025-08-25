@@ -1,4 +1,7 @@
 package com.example.authserver.repository.user;
 
-public interface AddressRepository {
+import com.example.authserver.entity.user.Address;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface AddressRepository extends JpaRepository<Address,String> {
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add User Profile</title>
+    <title>User Profile</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light d-flex flex-column min-vh-100">
@@ -17,10 +17,10 @@
 
 <main class="flex-grow-1 container px-4 py-5 d-flex flex-column align-items-center justify-content-center">
     <div class="bg-white p-5 rounded-3 shadow-sm w-100" style="max-width: 600px;">
-        <h1 class="h3 fw-bold text-center text-dark mb-4">Add User Profile</h1>
+        <h1 class="h3 fw-bold text-center text-dark mb-4">User Profile</h1>
 
         <!-- Form -->
-        <div th:unless="${savedUser}">
+        <div th:unless="${userProfile}">
             <form th:action="@{/add-profile}" th:object="${userProfileForm}" method="post">
 
                 <!-- Profile -->
@@ -73,13 +73,13 @@
         </div>
 
         <!-- Success Section -->
-        <div th:if="${savedUser}" class="text-center">
-            <p class="text-success fw-bold h5 mb-3">Profile Saved Successfully!</p>
+        <div th:if="${userProfile}" class="text-center">
+            <p th:if="${savedUser}" class="text-success fw-bold h5 mb-3">Profile Saved Successfully!</p>
             <div class="bg-light p-4 rounded border">
                 <h2 class="h5 fw-semibold mb-3">Saved Details</h2>
                 <table class="table table-borderless table-sm mb-0">
                     <tbody>
-                    <tr th:each="entry : ${savedUser.entrySet()}">
+                    <tr th:each="entry : ${userProfile.entrySet()}">
                         <td th:text="${entry.key}" class="fw-semibold text-muted"></td>
                         <td th:text="${entry.value}" class="text-dark"></td>
                     </tr>

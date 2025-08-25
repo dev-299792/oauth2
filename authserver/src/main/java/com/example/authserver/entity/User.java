@@ -1,5 +1,8 @@
 package com.example.authserver.entity;
 
+import com.example.authserver.entity.user.Address;
+import com.example.authserver.entity.user.Phone;
+import com.example.authserver.entity.user.UserProfile;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -37,6 +40,15 @@ public class User implements UserDetails {
 
     @Column(nullable = false)
     private boolean enabled = false;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserProfile profile;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Address> addresses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Phone> phones = new ArrayList<>();
 
     // UserDetails interface methods
 
