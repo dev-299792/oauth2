@@ -13,7 +13,7 @@ import lombok.Getter;
 public enum ApplicationType {
     WEB_APP("Web App"), SINGLE_PAGE_APP("Single Page App");
 
-    final private String displayName;
+    private final String displayName;
 
     ApplicationType(String displayName) {
         this.displayName = displayName;

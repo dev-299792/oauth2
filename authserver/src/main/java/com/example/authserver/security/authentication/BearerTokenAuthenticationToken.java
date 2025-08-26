@@ -36,10 +36,6 @@ public class BearerTokenAuthenticationToken extends AbstractAuthenticationToken 
         return principal;
     }
 
-    public String getToken() {
-        return token;
-    }
-
     public static BearerTokenAuthenticationToken unauthenticated(String token) {
         return new BearerTokenAuthenticationToken(token);
     }

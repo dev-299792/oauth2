@@ -4,7 +4,6 @@ import com.example.authserver.dto.UserDTO;
 import com.example.authserver.exception.EmailAlreadyUsedException;
 import com.example.authserver.exception.UserAlreadyExistsException;
 import com.example.authserver.services.RegistrationService;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

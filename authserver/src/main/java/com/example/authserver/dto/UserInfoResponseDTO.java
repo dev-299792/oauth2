@@ -1,11 +1,9 @@
 package com.example.authserver.dto;
 
-import com.example.authserver.entity.user.Address;
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.Instant;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Data

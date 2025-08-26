@@ -31,8 +31,8 @@ public class AuthorizationCode {
     @JoinColumn(name = "client_id", nullable = false, foreignKey = @ForeignKey(name = "fk_client_id"))
     private Client client;
 
-    @Column(nullable = false, length = 100)
-    private String user_id;
+    @Column(name = "user_id", nullable = false, length = 100)
+    private String userId;
 
     @Column(name = "redirect_uri", length = 255)
     private String redirectUri;

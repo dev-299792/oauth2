@@ -109,7 +109,7 @@ public class SecurityFilterConfig {
         http
                 .securityMatcher(NON_REST_API_REQUEST_MATCHER)
                 .authenticationProvider(daoAuthenticationProvider)
-                .authorizeHttpRequests((authorize) -> authorize
+                .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/login","/register","/verify-email","/verify").permitAll()
                         .anyRequest().authenticated()
                 )

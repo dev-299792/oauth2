@@ -5,15 +5,12 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.authserver.entity.User;
 import com.example.authserver.repository.UserRepository;
 import com.example.authserver.services.JwtService;
-import com.example.authserver.services.impl.UserDetailsServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetailsService;
-
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;

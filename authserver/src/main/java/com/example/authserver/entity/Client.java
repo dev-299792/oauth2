@@ -111,12 +111,10 @@ public class Client {
     private Set<String> stringToSet(String delimitedString) {
         String[] stringArray = StringUtils.delimitedListToStringArray(delimitedString," ");
         return Set.of(stringArray);
-        //return StringUtils.commaDelimitedListToSet(delimitedString);
     }
 
     private String collectionToString(Collection<String> collection) {
         return StringUtils.collectionToDelimitedString(collection," ");
-        //return StringUtils.collectionToCommaDelimitedString(collection);
     }
 
     @Override

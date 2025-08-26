@@ -47,7 +47,7 @@ public class ClientAuthorizationServiceImpl implements ClientAuthorizationServic
         AuthorizationCode code = AuthorizationCode
                 .builder()
                 .code(UUID.randomUUID().toString())
-                .user_id(getAuthenticatedUser().getUser_id())
+                .userId(getAuthenticatedUser().getUser_id())
                 .scopes(params.getScope())
                 .redirectUri(params.getRedirect_uri())
                 .client(client)

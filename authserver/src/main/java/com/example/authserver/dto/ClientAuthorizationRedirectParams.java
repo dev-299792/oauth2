@@ -4,13 +4,15 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.io.Serializable;
+
 
 /**
  * DTO for the parameters in the authorization request.
  *
  */
 @Data
-public class ClientAuthorizationRedirectParams {
+public class ClientAuthorizationRedirectParams implements Serializable {
 
     @NotNull(message = "is blank or missing")
     @NotBlank(message = "is blank or missing")

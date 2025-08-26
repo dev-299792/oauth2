@@ -110,7 +110,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
 
         Date expiresAt = new Date( new Date().getTime() + 5 * 60 * 1000 );
 
-        return jwtService.generateToken(authorizationCode.getUser_id(),
+        return jwtService.generateToken(authorizationCode.getUserId(),
                                                     expiresAt,
                                               null,
                                                     client.getClientId());
@@ -136,7 +136,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
                 client = authorizationCode.getClient();
             }
             validateAccessTokenRequest(requestDTO, authorizationCode, client);
-            AccessToken accessToken = createAccessToken(authorizationCode.getUser_id(),
+            AccessToken accessToken = createAccessToken(authorizationCode.getUserId(),
                                                         client, authorizationCode.getScopes());
             AccessTokenResponseDTO tokenResponseDTO = toResponseDTO(accessToken);
             String idToken = generateIdToken(client,authorizationCode);
