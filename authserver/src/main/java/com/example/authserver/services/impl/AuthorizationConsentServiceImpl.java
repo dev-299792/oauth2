@@ -76,6 +76,7 @@ public class AuthorizationConsentServiceImpl implements AuthorizationConsentServ
      * @return the saved or updated AuthorizationConsent entity
      * @throws InvalidRequestException if the client does not exist
      */
+    @Transactional
     public AuthorizationConsent saveConsent(String clientId,
                                              String scope) {
 

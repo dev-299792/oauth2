@@ -7,6 +7,7 @@ import com.example.authserver.repository.VerificationTokenRepository;
 import com.example.authserver.services.VerificationTokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -37,6 +38,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
      * @return a unique token string
      */
     @Override
+    @Transactional
     public String generateToken(User user) {
 
         VerificationToken token = VerificationToken.builder()

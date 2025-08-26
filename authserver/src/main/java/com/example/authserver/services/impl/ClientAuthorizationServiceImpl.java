@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -36,6 +37,7 @@ public class ClientAuthorizationServiceImpl implements ClientAuthorizationServic
      * @throws InvalidRequestException if client validation fails
      * @throws RedirectBackWithErrorException if response_type or scope is invalid
      */
+    @Transactional
     public String getAuthorizationCode(ClientAuthorizationRedirectParams params) {
 
         Client client = clientRepository.findClientByClientId(params.getClient_id()).orElse(null);

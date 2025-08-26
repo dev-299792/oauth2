@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,6 +32,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public void saveUserData(UserProfileDTO userProfileDTO) {
 
         User user = getAuthenticatedUser();

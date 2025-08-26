@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -66,6 +67,7 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
      * @return a ClientRegResponseDTO containing details of the registered client,
      *         including the encoded client secret
      */
+    @Transactional
     public ClientRegResponseDTO registerClient(ClientRegRequestDTO clientRegRequest) {
 
         String clientId = UUID.randomUUID().toString();

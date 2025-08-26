@@ -11,6 +11,7 @@ import com.example.authserver.services.VerificationTokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -51,6 +52,7 @@ public class RegistrationServiceImpl implements RegistrationService {
      * @throws UserAlreadyExistsException if a user with the given username already exists
      * @throws EmailAlreadyUsedException if a user with the given email already exists
      */
+    @Transactional
     public void registerUser(UserDTO userDTO) {
 
         if (userRepository.existsByUsername(userDTO.getUsername())) {
