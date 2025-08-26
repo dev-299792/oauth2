@@ -1,9 +1,11 @@
 package com.example.authserver.services.impl;
 
+import com.example.authserver.dto.ConsentDTO;
 import com.example.authserver.entity.AuthorizationConsent;
 import com.example.authserver.entity.Client;
 import com.example.authserver.entity.User;
 import com.example.authserver.exception.InvalidRequestException;
+import com.example.authserver.repository.AccessTokenRepository;
 import com.example.authserver.repository.AuthorizationConsentRepository;
 import com.example.authserver.repository.ClientRepository;
 import com.example.authserver.services.AuthorizationConsentService;
@@ -11,9 +13,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -28,6 +32,7 @@ public class AuthorizationConsentServiceImpl implements AuthorizationConsentServ
 
     private final AuthorizationConsentRepository consentRepository;
     private final ClientRepository clientRepository;
+    private final AccessTokenRepository accessTokenRepository;
 
     /**
      * Checks whether the authenticated user has already provided consent for a given client and scope.
@@ -95,6 +100,27 @@ public class AuthorizationConsentServiceImpl implements AuthorizationConsentServ
         }
         consent = consentRepository.save(consent);
         return consent;
+    }
+
+    @Override
+    public List<ConsentDTO> getClientConsents() {
+
+        User user = getAuthenticatedUser();
+
+        return consentRepository.findByUserId(user.getUser_id())
+                .stream()
+                .map(c ->
+                        new ConsentDTO(c.getClientId(),c.getScopesSet()))
+                .toList();
+
+    }
+
+    @Transactional
+    @Override
+    public void revokeConsents(String clientId) {
+        User user = getAuthenticatedUser();
+        consentRepository.deleteAllByUserIdAndClientId(user.getUser_id(), clientId);
+        accessTokenRepository.deleteAllByUserIdAndClientId(user.getUser_id(), clientId);
     }
 
     /**

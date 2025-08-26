@@ -91,7 +91,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         AccessToken token = AccessToken
                 .builder()
                 .token(jwtToken)
-                .user_id(userId)
+                .userId(userId)
                 .refreshToken(UUID.randomUUID().toString())
                 .client(client)
                 .scopes(scopes)
@@ -163,7 +163,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
 
         try {
             validateRefreshTokenRequest(oldToken,requestDTO);
-            AccessToken token = createAccessToken(oldToken.getUser_id(), oldToken.getClient(), requestDTO.getScopes());
+            AccessToken token = createAccessToken(oldToken.getUserId(), oldToken.getClient(), requestDTO.getScopes());
             return toResponseDTO(token);
         } finally {
             oldToken.setRefreshTokenExpiresAt(LocalDateTime.now().minusHours(1));

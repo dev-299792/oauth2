@@ -1,7 +1,9 @@
 package com.example.authserver.services;
 
+import com.example.authserver.dto.ConsentDTO;
 import com.example.authserver.entity.AuthorizationConsent;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -35,4 +37,15 @@ public interface AuthorizationConsentService {
      * @return the saved AuthorizationConsent entity
      */
     AuthorizationConsent saveConsent(String clientId, String scope);
+
+    /**
+     * Revokes all the user's consent for the given client.
+     * Also invalidates all access token tokens for that client.
+     *
+     * @param clientId the client ID
+     */
+    void revokeConsents(String clientId);
+
+    List<ConsentDTO> getClientConsents();
+
 }

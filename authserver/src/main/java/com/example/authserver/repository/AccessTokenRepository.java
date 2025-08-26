@@ -19,4 +19,6 @@ public interface AccessTokenRepository extends JpaRepository<AccessToken,String>
      * @return an Optional containing the matching {@link AccessToken}, if found
      */
     Optional<AccessToken> findByRefreshToken(String refreshToken);
+
+    void deleteAllByUserIdAndClientId(String userId, String clientId);
 }

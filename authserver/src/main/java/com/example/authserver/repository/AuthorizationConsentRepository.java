@@ -3,6 +3,8 @@ package com.example.authserver.repository;
 import com.example.authserver.entity.AuthorizationConsent;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 /**
  * Repository for managing {@link AuthorizationConsent} entities.
  *
@@ -10,6 +12,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface AuthorizationConsentRepository
         extends JpaRepository<AuthorizationConsent,String> {
+
+
+    List<AuthorizationConsent> findByUserId(String userId);
 
     /**
      * Finds an authorization consent by user ID and client ID.
@@ -19,4 +24,7 @@ public interface AuthorizationConsentRepository
      * @return the matching {@link AuthorizationConsent}, or {@code null} if none found
      */
     AuthorizationConsent findByUserIdAndClientId(String userId,String clientId);
+
+
+    void deleteAllByUserIdAndClientId(String userId,String clientId);
 }

@@ -33,7 +33,7 @@ public class AccessToken {
     private Client client;
 
     @Column(name = "user_id", length = 100, nullable = false)
-    private String user_id;
+    private String userId;
 
     @Column(name = "scopes", length = 255)
     private String scopes;
